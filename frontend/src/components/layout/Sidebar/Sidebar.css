@@ -1,0 +1,408 @@
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap");
+
+.sidebar {
+  --sb-bg: var(--main-sidebar-bg, #e3e7ff);
+  --sb-primary: var(--main-sidebar-text, #250299);
+  --sb-text: var(--main-sidebar-text, #250299);
+  --sb-hover: rgba(37, 2, 153, 0.1);
+  --sb-active-bg: var(--main-sidebar-active-bg, #ffffff);
+  --sb-active-text: var(--main-sidebar-text, #250299);
+  --sb-badge-bg: var(--card-bg, #ffffff);
+
+  font-family: "Vazirmatn", sans-serif;
+  direction: rtl;
+  width: 100%;
+  min-width: 0;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100vh;
+  max-height: 100dvh;
+  flex-shrink: 0;
+  background: var(--sb-bg);
+  color: var(--sb-text);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 22px 18px 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+html[data-theme="dark"] .sidebar {
+  --sb-hover: rgba(139, 111, 240, 0.12);
+  border-left: 1px solid var(--border, #2a2447);
+}
+
+.sidebar,
+.sidebar * {
+  box-sizing: border-box;
+}
+
+.sidebar__mobile-close {
+  display: none;
+}
+
+.sidebar__top {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.sidebar-logo {
+  width: 100%;
+  height: 90px;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.sidebar-logo__image {
+  width: 104px;
+  max-width: 112px;
+  max-height: 86px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.sidebar__section-label {
+  color: var(--sb-primary);
+  font-size: 16px;
+  font-weight: 800;
+  text-align: right;
+  margin-bottom: 14px;
+  padding: 0 14px;
+  flex-shrink: 0;
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-height: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+
+.sidebar__nav::-webkit-scrollbar {
+  display: none;
+}
+
+.sidebar__item {
+  width: 100%;
+  min-height: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+  gap: 12px;
+  padding: 0 16px;
+  border-radius: 15px;
+  border: none;
+  background: transparent;
+  color: var(--sb-text);
+  font-family: "Vazirmatn", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  direction: rtl;
+  text-align: right;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  flex-shrink: 0;
+}
+
+.sidebar__item:hover {
+  background: var(--sb-hover);
+}
+
+.sidebar__item.active {
+  background: var(--sb-active-bg);
+  color: var(--sb-active-text);
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(37, 2, 153, 0.08);
+}
+
+html[data-theme="dark"] .sidebar__item.active {
+  background: var(--bg-surface-2, #241d40);
+  color: var(--text-primary, #edeaf8);
+  box-shadow: none;
+  border: 1px solid var(--border-strong, #3a3260);
+}
+
+.sidebar__item-icon {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar__item-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sidebar__item-label {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar__footer {
+  margin-top: 18px;
+  flex: 0 0 auto;
+}
+
+.user-box {
+  width: 100%;
+  min-height: 58px;
+  background: var(--sb-badge-bg);
+  color: var(--text-main, #111827);
+  border-radius: 14px;
+  padding: 7px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  direction: rtl;
+  text-align: right;
+  box-shadow: 0 6px 14px rgba(37, 2, 153, 0.06);
+  overflow: hidden;
+}
+
+.user-box__username {
+  width: 100%;
+  color: var(--color-primary, #250299);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.3;
+  padding-bottom: 6px;
+}
+
+.user-box__role {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-main, #111827);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  padding-top: 6px;
+  border-top: 1px solid rgba(37, 2, 153, 0.12);
+}
+
+.user-box__role span {
+  color: var(--text-main, #111827);
+  opacity: 0.78;
+}
+
+.user-box__role strong {
+  color: var(--color-primary, #250299);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.user-box__logout {
+  width: 100%;
+  height: 34px;
+  margin-top: 9px;
+  border: none;
+  border-radius: 10px;
+  background: #250299;
+  color: #ffffff;
+  font-family: "Vazirmatn", sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.18s, transform 0.18s, background 0.18s;
+}
+
+.user-box__logout:hover {
+  opacity: 0.9;
+  background: #1d0278;
+}
+
+.user-box__logout:active {
+  transform: scale(0.98);
+}
+
+html[data-theme="dark"] .user-box {
+  background: rgba(237, 234, 248, 0.07);
+  color: var(--text-primary, #edeaf8);
+  box-shadow: none;
+  border: 1px solid var(--border, #2a2447);
+}
+
+html[data-theme="dark"] .user-box__role {
+  border-top-color: var(--border-strong, #3a3260);
+}
+
+html[data-theme="dark"] .user-box__username,
+html[data-theme="dark"] .user-box__role,
+html[data-theme="dark"] .user-box__role span,
+html[data-theme="dark"] .user-box__role strong {
+  color: var(--text-primary, #edeaf8);
+}
+
+html[data-theme="dark"] .user-box__logout {
+  background: var(--bg-surface-2, #241d40);
+  color: var(--text-primary, #edeaf8);
+  border: 1px solid var(--border-strong, #3a3260);
+}
+
+html[data-theme="dark"] .user-box__logout:hover {
+  background: var(--accent-pressed, #7259d6);
+  color: var(--text-primary, #edeaf8);
+}
+
+@media (max-height: 760px) and (min-width: 1025px) {
+  .sidebar {
+    padding-top: 18px;
+    padding-bottom: 14px;
+  }
+
+  .sidebar-logo {
+    height: 78px;
+    min-height: 78px;
+    margin-bottom: 10px;
+  }
+
+  .sidebar-logo__image {
+    width: 98px;
+    max-height: 76px;
+  }
+
+  .sidebar__section-label {
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  .sidebar__nav {
+    gap: 6px;
+  }
+
+  .sidebar__item {
+    height: 52px;
+    min-height: 52px;
+    font-size: 15px;
+    border-radius: 14px;
+  }
+
+  .sidebar__footer {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    padding: 18px 16px;
+  }
+
+  .sidebar__mobile-close {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.62);
+    color: var(--sb-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  html[data-theme="dark"] .sidebar__mobile-close {
+    background: rgba(237, 234, 248, 0.1);
+    color: var(--text-primary, #edeaf8);
+  }
+
+  .sidebar-logo {
+    height: 78px;
+    min-height: 78px;
+    margin-bottom: 12px;
+  }
+
+  .sidebar-logo__image {
+    width: 92px;
+    max-height: 76px;
+  }
+
+  .sidebar__item {
+    min-height: 52px;
+    height: 52px;
+    font-size: 15px;
+    border-radius: 14px;
+  }
+}
+/* افزایش جزئی سایز فونت سایدبار اصلی */
+.sidebar__section-label {
+  font-size: 17px !important;
+}
+
+.sidebar__item {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+}
+
+.sidebar__item-label {
+  font-size: 17px !important;
+}
+
+.user-box__username {
+  font-size: 14px !important;
+}
+
+.user-box__role {
+  font-size: 12.5px !important;
+}
+
+.user-box__role strong {
+  font-size: 13px !important;
+}
+
+/* در حالت موبایل همان اندازه جمع‌وجور بماند */
+@media (max-width: 900px) {
+  .sidebar__section-label {
+    font-size: 15px !important;
+  }
+
+  .sidebar__item,
+  .sidebar__item-label {
+    font-size: 14px !important;
+  }
+}

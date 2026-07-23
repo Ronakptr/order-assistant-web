@@ -1,0 +1,554 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+
+.security-settings {
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  font-family: 'Vazirmatn', sans-serif;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.security-settings,
+.security-settings * {
+  box-sizing: border-box;
+}
+
+.security-settings__card {
+  width: 100%;
+  min-height: calc(100vh - 56px);
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e4e7ff);
+  border-radius: 16px;
+  box-shadow: 0 1px 8px rgba(37, 2, 153, 0.08);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.security-settings__content {
+  width: 100%;
+  max-width: 930px;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.security-settings__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.security-settings__header h2 {
+  margin: 0 0 8px;
+  color: var(--text-primary, #111827);
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.security-settings__header p {
+  margin: 0;
+  color: var(--text-secondary, #64748b);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.9;
+}
+
+.security-section {
+  width: 100%;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e6e8ff);
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.security-section__title-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--border-color, #eef0ff);
+  padding-bottom: 14px;
+}
+
+.security-section__title-wrap h3 {
+  margin: 0;
+  color: var(--text-primary, #111827);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.security-section__title-wrap span {
+  color: var(--text-secondary, #7c83a3);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.security-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.security-grid--backup {
+  max-width: 760px;
+}
+
+.security-field {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.security-field > span,
+.security-field label {
+  color: var(--text-primary, #111827);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.security-field input {
+  width: 100%;
+  height: 39px;
+  border: 1px solid var(--input-border, #dfe3ff);
+  border-radius: 11px;
+  background: var(--input-bg, #ffffff);
+  color: var(--text-primary, #111827);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  outline: none;
+  text-align: right;
+  padding: 7px 12px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.security-field input[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+}
+
+.security-field input:focus {
+  border-color: var(--primary-color, #250299);
+  box-shadow: 0 0 0 3px rgba(37, 2, 153, 0.1);
+}
+
+.username-input-wrap {
+  position: relative;
+  width: 100%;
+  height: 39px;
+}
+
+.username-input-wrap input {
+  height: 39px;
+  padding-left: 74px;
+}
+
+.username-actions {
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.username-save-btn,
+.username-cancel-btn {
+  width: 27px;
+  height: 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.username-save-btn {
+  background: var(--primary-color, #250299);
+  color: #ffffff;
+}
+
+.username-cancel-btn {
+  background: #eef0ff;
+  color: #250299;
+}
+
+.username-save-btn:hover {
+  background: #3510b8;
+}
+
+.username-cancel-btn:hover {
+  background: #e0e4ff;
+}
+
+.password-readonly-box {
+  width: 100%;
+  min-height: 65px;
+  border: 1px dashed var(--border-color, #dfe3ff);
+  border-radius: 13px;
+  background: rgba(139, 92, 246, 0.07);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+}
+
+.password-readonly-box strong {
+  direction: ltr;
+  text-align: left;
+  color: var(--text-primary, #111827);
+  font-size: 18px;
+  letter-spacing: 3px;
+  line-height: 1;
+}
+
+.password-readonly-box small {
+  color: var(--text-secondary, #64748b);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.8;
+}
+
+.security-primary-btn,
+.change-password-btn {
+  width: fit-content;
+  min-width: 150px;
+  height: 39px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 11px;
+  background: var(--primary-color, #250299);
+  color: #ffffff;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 12.5px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 10px 24px rgba(37, 2, 153, 0.16);
+}
+
+.change-password-btn {
+  margin-top: 4px;
+}
+
+.security-primary-btn:hover,
+.change-password-btn:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+.security-primary-btn:disabled,
+.change-password-btn:disabled,
+.security-modal__btn:disabled,
+.username-save-btn:disabled,
+.username-cancel-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.security-alert {
+  width: 100%;
+  border-radius: 13px;
+  padding: 11px 14px;
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.8;
+}
+
+.security-alert--success {
+  color: #067647;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.security-alert--error {
+  color: #b42318;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.security-alert--info {
+  color: #250299;
+  background: rgba(37, 2, 153, 0.08);
+  border: 1px solid rgba(37, 2, 153, 0.18);
+}
+
+.security-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 12, 35, 0.58);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 130px 24px 24px;
+  z-index: 2000;
+  direction: rtl;
+  border-radius: 16px;
+  backdrop-filter: blur(5px);
+}
+
+.security-modal {
+  width: 390px;
+  max-width: 95%;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e4e7ff);
+  border-radius: 16px;
+  padding: 34px 20px 18px;
+  box-shadow: 0 26px 80px rgba(17, 24, 39, 0.28);
+  position: relative;
+  direction: rtl;
+}
+
+.security-modal__title {
+  margin: 0 0 18px;
+  color: var(--text-primary, #111827);
+  font-size: 17px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.security-modal__close {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.security-modal__close:hover {
+  color: var(--primary-color, #250299);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.security-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.security-modal__field label {
+  color: var(--text-primary, #111827);
+  font-size: 12.5px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.security-password-field {
+  position: relative;
+  width: 100%;
+  height: 39px;
+}
+
+.security-password-field input {
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--input-border, #dfe3ff);
+  border-radius: 11px;
+  background: var(--input-bg, #ffffff);
+  color: var(--text-primary, #111827);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  outline: none;
+  text-align: left;
+  direction: ltr;
+  padding: 7px 42px 7px 12px;
+}
+
+.security-password-field input:focus {
+  border-color: var(--primary-color, #250299);
+  box-shadow: 0 0 0 3px rgba(37, 2, 153, 0.1);
+}
+
+.security-password-field__eye {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 25px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.security-password-field__eye:hover {
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--primary-color, #250299);
+}
+
+.security-modal__error {
+  color: #b42318;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 10px;
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.8;
+  margin: 0 0 12px;
+}
+
+.security-modal__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  direction: rtl;
+  margin-top: 12px;
+}
+
+.security-modal__btn {
+  min-width: 112px;
+  height: 38px;
+  border: none;
+  border-radius: 11px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 12.5px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.security-modal__btn--cancel {
+  background: var(--bg-surface-2, #f3f4f6);
+  color: var(--text-secondary, #4b5563);
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.security-modal__btn--save {
+  background: var(--primary-color, #250299);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(37, 2, 153, 0.16);
+}
+
+.security-modal__btn--cancel:hover {
+  filter: brightness(0.98);
+}
+
+.security-modal__btn--save:hover {
+  filter: brightness(1.08);
+}
+
+html[data-theme="dark"] .security-settings__card,
+html[data-theme="dark"] .security-section,
+html[data-theme="dark"] .security-modal {
+  background: var(--card-bg, #17122b) !important;
+  border-color: rgba(139, 111, 240, 0.24) !important;
+  color: var(--text-primary, #f5f3ff) !important;
+}
+
+html[data-theme="dark"] .security-settings__header h2,
+html[data-theme="dark"] .security-section__title-wrap h3,
+html[data-theme="dark"] .security-field > span,
+html[data-theme="dark"] .security-modal__title,
+html[data-theme="dark"] .security-modal__field label,
+html[data-theme="dark"] .password-readonly-box strong {
+  color: var(--text-primary, #f5f3ff) !important;
+}
+
+html[data-theme="dark"] .security-settings__header p,
+html[data-theme="dark"] .security-section__title-wrap span,
+html[data-theme="dark"] .password-readonly-box small,
+html[data-theme="dark"] .security-modal__close {
+  color: var(--text-secondary, #b9b2d5) !important;
+}
+
+html[data-theme="dark"] .security-field input,
+html[data-theme="dark"] .security-password-field input {
+  background: var(--input-bg, #211a3a) !important;
+  border-color: rgba(139, 111, 240, 0.28) !important;
+  color: var(--text-primary, #f5f3ff) !important;
+}
+
+html[data-theme="dark"] .security-field input::placeholder,
+html[data-theme="dark"] .security-password-field input::placeholder {
+  color: rgba(222, 216, 255, 0.55) !important;
+}
+
+html[data-theme="dark"] .password-readonly-box {
+  background: rgba(139, 111, 240, 0.12) !important;
+  border-color: rgba(139, 111, 240, 0.34) !important;
+}
+
+html[data-theme="dark"] .username-cancel-btn,
+html[data-theme="dark"] .security-modal__btn--cancel {
+  background: #2a2245 !important;
+  color: #f5f3ff !important;
+  border-color: rgba(139, 111, 240, 0.28) !important;
+}
+
+html[data-theme="dark"] .security-alert--success {
+  color: #72ffad !important;
+  background: rgba(34, 197, 94, 0.18) !important;
+  border-color: rgba(114, 255, 173, 0.38) !important;
+}
+
+html[data-theme="dark"] .security-alert--error {
+  color: #ff9e9e !important;
+  background: rgba(239, 68, 68, 0.18) !important;
+  border-color: rgba(255, 158, 158, 0.38) !important;
+}
+
+html[data-theme="dark"] .security-modal-backdrop {
+  background: rgba(5, 3, 16, 0.64) !important;
+}
+
+@media (max-width: 900px) {
+  .security-settings__card {
+    min-height: auto;
+    padding: 18px;
+  }
+
+  .security-settings__content {
+    max-width: 100%;
+  }
+
+  .security-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .security-section__title-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .security-modal-backdrop {
+    align-items: center;
+    padding: 18px;
+  }
+}

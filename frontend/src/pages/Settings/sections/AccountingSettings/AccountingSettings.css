@@ -1,0 +1,980 @@
+.accounting-settings {
+  width: 100%;
+  height: calc(100vh - 94px);
+  min-height: 0;
+  direction: rtl;
+  text-align: right;
+  font-family: "Vazirmatn", "Tahoma", sans-serif;
+  color: var(--text-main, #111111);
+  background: transparent;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-page:has(.accounting-settings),
+.settings-content:has(.accounting-settings) {
+  overflow: hidden !important;
+}
+
+.accounting-settings,
+.accounting-settings * {
+  box-sizing: border-box;
+}
+
+.accounting-settings :not(button),
+.accounting-settings :not(button) > span,
+.accounting-settings label,
+.accounting-settings input,
+.accounting-settings select,
+.accounting-settings p,
+.accounting-settings h2,
+.accounting-settings h3,
+.accounting-settings h4,
+.accounting-settings small {
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-page-header {
+  width: 100%;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 0 2px;
+  margin-bottom: 8px;
+  direction: rtl;
+}
+
+.accounting-page-header h2 {
+  margin: 0;
+  color: var(--text-title, #111111);
+  font-size: 23px;
+  font-weight: 950;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.accounting-save-top,
+.accounting-primary-button,
+.accounting-outline-button {
+  min-height: 40px;
+  border-radius: 12px;
+  padding: 0 18px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  text-align: center;
+}
+
+.accounting-save-top:hover,
+.accounting-primary-button:hover,
+.accounting-outline-button:hover {
+  transform: translateY(-1px);
+}
+
+.accounting-save-top,
+.accounting-primary-button {
+  border: 1px solid var(--color-primary, #250299);
+  background: var(--color-primary, #250299);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(37, 2, 153, 0.14);
+}
+
+.accounting-outline-button {
+  border: 1px solid var(--border-color, #d2d2d2);
+  background: var(--card-bg, #ffffff);
+  color: var(--color-primary, #250299);
+  box-shadow: none;
+}
+
+.accounting-save-top:disabled,
+.accounting-primary-button:disabled,
+.accounting-outline-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.accounting-progress {
+  width: 100%;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+  direction: rtl;
+}
+
+.accounting-progress__item {
+  min-width: 0;
+  min-height: 40px;
+  border-radius: 12px;
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  direction: rtl;
+  font-size: 13.5px;
+  font-weight: 900;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border: 1px solid var(--border-color, #d2d2d2);
+  box-shadow: none;
+}
+
+.accounting-progress__item::before,
+.accounting-progress__item::after {
+  content: none !important;
+  display: none !important;
+}
+
+.accounting-progress__item--done {
+  background: rgba(37, 2, 153, 0.08);
+  color: var(--color-primary, #250299);
+  border-color: rgba(37, 2, 153, 0.18);
+}
+
+.accounting-progress__item--active {
+  background: var(--color-primary, #250299);
+  color: #ffffff;
+  border-color: var(--color-primary, #250299);
+}
+
+.accounting-progress__item--idle {
+  background: #f7f7fb;
+  color: var(--text-soft, #7b7fc4);
+  border-color: var(--border-color, #d2d2d2);
+}
+
+.accounting-stage-holder {
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.accounting-loading-card,
+.accounting-stage-card {
+  width: 100%;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #d2d2d2);
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft, 0 2px 14px rgba(17, 24, 39, 0.06));
+  overflow: hidden;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-loading-card {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft, #7b7fc4);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.accounting-stage-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  padding: 16px 24px 14px;
+}
+
+.accounting-stage-card h3 {
+  margin: 0;
+  color: var(--text-title, #111111);
+  font-size: 21px;
+  font-weight: 950;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.accounting-stage-card__subtitle {
+  margin: 5px 0 10px;
+  color: var(--text-soft, #7b7fc4);
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.7;
+  text-align: right;
+}
+
+.accounting-stage-card__body {
+  padding: 0;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-global-status {
+  width: 100%;
+  margin: 0 0 10px;
+  border: 1px solid rgba(37, 2, 153, 0.18);
+  border-radius: 12px;
+  background: rgba(37, 2, 153, 0.055);
+  color: var(--color-primary, #250299);
+  padding: 9px 13px;
+  font-size: 13.5px;
+  font-weight: 900;
+  line-height: 1.75;
+  text-align: right;
+}
+
+.accounting-alert-card {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid;
+  padding: 0;
+  margin: 0 0 12px;
+  overflow: hidden;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-alert-card__title {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+  gap: 7px;
+  padding: 11px 16px 4px;
+  font-size: 15px;
+  font-weight: 950;
+  text-align: right;
+  direction: rtl;
+}
+
+.accounting-alert-card__title b {
+  font-size: 15px;
+  font-weight: 950;
+  line-height: 1;
+  flex: 0 0 auto;
+  order: 0;
+  text-align: center;
+}
+
+.accounting-alert-card__title span {
+  order: 1;
+  text-align: right;
+}
+
+.accounting-alert-card__lines {
+  padding: 0 18px 10px;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-alert-card__lines p {
+  margin: 0 0 5px;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.85;
+  text-align: right;
+}
+
+.accounting-alert-card--info {
+  background: #f0f6ff;
+  color: #174ea6;
+  border-color: #bfd7ff;
+}
+
+.accounting-alert-card--warn {
+  background: #fff7e6;
+  color: #8a5a00;
+  border-color: #ffd38a;
+}
+
+.accounting-alert-card--danger {
+  background: #fff1f2;
+  color: #b42335;
+  border-color: #ffb8c0;
+}
+
+.accounting-alert-card--success {
+  background: #ecfdf5;
+  color: #137a3b;
+  border-color: #b8e6c8;
+}
+
+.accounting-stage-one-form {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 20px;
+  margin: 5px 0 10px;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-provider-select-wrap {
+  width: min(100%, 420px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+  color: var(--text-title, #111111);
+  font-size: 13px;
+  font-weight: 950;
+  text-align: right;
+  direction: rtl;
+  margin-left: auto;
+}
+
+.accounting-provider-select-wrap > span {
+  display: block;
+  width: 100%;
+  text-align: right;
+  direction: rtl;
+}
+
+.accounting-provider-select-box {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-provider-select-wrap select {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 40px;
+  border: 1px solid var(--border-color, #d2d2d2);
+  border-left: none;
+  border-radius: 0 12px 12px 0;
+  background: var(--input-bg, #ffffff);
+  color: var(--input-text, #111111);
+  outline: none;
+  text-align: right;
+  text-align-last: right;
+  padding: 0 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  direction: rtl;
+}
+
+.accounting-provider-select-wrap select:focus {
+  border-color: var(--color-primary, #250299);
+  box-shadow: 0 0 0 2px rgba(37, 2, 153, 0.08);
+}
+
+.accounting-connection-status {
+  flex: 0 0 auto;
+  min-width: 68px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  border-radius: 12px 0 0 12px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 950;
+  white-space: nowrap;
+  text-align: center !important;
+  direction: rtl;
+}
+
+.accounting-connection-status--success {
+  color: #137a3b;
+  background: #ecfdf5;
+  border-color: #b8e6c8;
+}
+
+.accounting-connection-status--warn {
+  color: #8a5a00;
+  background: #fff7e6;
+  border-color: #ffd38a;
+}
+
+.accounting-workflow-hint {
+  margin: 10px 0 0;
+  color: var(--text-soft, #7b7fc4);
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.75;
+  text-align: right;
+}
+
+.accounting-actions-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.accounting-actions-row--single {
+  justify-content: flex-start;
+  direction: ltr;
+}
+
+.accounting-actions-row--single > * {
+  direction: rtl;
+}
+
+.accounting-actions-row--split {
+  justify-content: space-between;
+  direction: rtl;
+}
+
+.accounting-actions-row__right,
+.accounting-actions-row__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.accounting-actions-row__right {
+  justify-content: flex-start;
+  direction: rtl;
+}
+
+.accounting-actions-row__left {
+  justify-content: flex-end;
+  margin-right: auto;
+  direction: rtl;
+}
+
+.accounting-actions-row__left--attached {
+  gap: 8px;
+}
+
+.accounting-actions-row__primary-wide {
+  min-width: 230px;
+}
+
+.accounting-two-column-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-mini-card {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--border-color, #d2d2d2);
+  background: var(--card-bg, #ffffff);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-mini-card h4 {
+  margin: 0;
+  padding: 10px 14px 6px;
+  color: var(--text-title, #111111);
+  font-size: 14px;
+  font-weight: 950;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.accounting-mini-card__body {
+  flex: 1;
+  padding: 0 14px 11px;
+  display: flex;
+  flex-direction: column;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-entry-grid {
+  width: 100%;
+  display: grid;
+  gap: 8px 12px;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-entry-grid--ids,
+.accounting-entry-grid--defaults {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.accounting-labeled-entry {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-labeled-entry span {
+  color: var(--text-title, #111111);
+  font-size: 12px;
+  font-weight: 950;
+  text-align: right;
+}
+
+.accounting-labeled-entry input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid var(--border-color, #d2d2d2);
+  border-radius: 11px;
+  background: var(--input-bg, #ffffff);
+  color: var(--input-text, #111111);
+  outline: none;
+  text-align: right;
+  padding: 0 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  direction: rtl;
+}
+
+.accounting-labeled-entry input:focus {
+  border-color: var(--color-primary, #250299);
+  box-shadow: 0 0 0 2px rgba(37, 2, 153, 0.08);
+}
+
+.accounting-mini-note {
+  margin: 7px 7px 0;
+  color: var(--text-soft, #7b7fc4);
+  font-size: 12.6px;
+  font-weight: 850;
+  line-height: 1.75;
+  text-align: right;
+}
+
+.accounting-mini-note--top {
+  margin: 0 7px 10px;
+}
+
+.accounting-checkline {
+  margin: auto 7px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  color: var(--text-title, #111111);
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-checkline input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--color-primary, #250299);
+  flex: 0 0 auto;
+}
+
+.accounting-import-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+  direction: rtl;
+}
+
+.accounting-import-buttons__wide {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  min-width: 0;
+}
+
+.accounting-wide-button {
+  align-self: flex-start;
+  min-width: 260px;
+  margin-bottom: 8px;
+}
+
+.accounting-stage-status {
+  margin: 8px 8px 0;
+  color: var(--color-primary, #250299);
+  font-size: 12px;
+  font-weight: 950;
+  line-height: 1.7;
+  text-align: right;
+}
+
+.accounting-output-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 8px 14px;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-output-row p {
+  margin: 0;
+  color: var(--color-primary, #250299);
+  font-size: 12.5px;
+  font-weight: 950;
+  line-height: 1.7;
+  text-align: right;
+}
+
+.accounting-template-row {
+  width: 100%;
+  border: 1px solid var(--border-color, #d2d2d2);
+  background: var(--card-bg, #ffffff);
+  border-radius: 16px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  direction: rtl;
+  text-align: right;
+}
+
+.accounting-template-row span {
+  color: var(--text-soft, #7b7fc4);
+  font-size: 12.6px;
+  font-weight: 850;
+  line-height: 1.75;
+  text-align: right;
+}
+
+
+/* مرحله‌ها: متن کارت‌های بالا فقط وسط‌چین باشند */
+.accounting-settings .accounting-progress__item {
+  justify-content: center !important;
+  text-align: center !important;
+  direction: rtl;
+}
+
+/* دکمه مرحله اول: همیشه سمت چپ */
+.accounting-actions-row--single {
+  justify-content: flex-start !important;
+  direction: ltr !important;
+}
+
+.accounting-actions-row--single > * {
+  direction: rtl !important;
+}
+
+/* دکمه‌های چندتایی: بازگشت راست، ادامه و دکمه‌های همراه چپ */
+.accounting-actions-row--split {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  direction: rtl;
+}
+
+.accounting-actions-row--split .accounting-actions-row__right {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.accounting-actions-row--split .accounting-actions-row__left {
+  grid-column: 3;
+  justify-self: end;
+  margin: 0 !important;
+}
+
+.accounting-actions-row--transfer .accounting-actions-row__left--attached {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+/* صفحه انتقال داده باید کامل داخل صفحه دیده شود */
+.accounting-stage-card--transfer {
+  padding-top: 13px;
+  padding-bottom: 11px;
+}
+
+.accounting-stage-card--transfer h3 {
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.accounting-stage-card--transfer .accounting-stage-card__subtitle {
+  margin-bottom: 6px;
+  line-height: 1.55;
+}
+
+.accounting-stage-card--transfer .accounting-alert-card {
+  margin-bottom: 8px;
+}
+
+.accounting-stage-card--transfer .accounting-alert-card__title {
+  padding-top: 8px;
+  padding-bottom: 2px;
+  font-size: 14px;
+}
+
+.accounting-stage-card--transfer .accounting-alert-card__lines {
+  padding-bottom: 7px;
+}
+
+.accounting-stage-card--transfer .accounting-alert-card__lines p {
+  margin-bottom: 2px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.accounting-stage-card--transfer .accounting-two-column-grid {
+  gap: 10px;
+}
+
+.accounting-stage-card--transfer .accounting-mini-card h4 {
+  padding-top: 8px;
+  padding-bottom: 4px;
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+
+.accounting-stage-card--transfer .accounting-mini-card__body {
+  padding-bottom: 8px;
+}
+
+.accounting-stage-card--transfer .accounting-mini-note {
+  font-size: 11.8px;
+  line-height: 1.55;
+  margin-top: 4px;
+}
+
+.accounting-stage-card--transfer .accounting-mini-note--top {
+  margin-bottom: 6px;
+}
+
+.accounting-stage-card--transfer .accounting-import-buttons {
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.accounting-stage-card--transfer .accounting-wide-button {
+  margin-bottom: 6px;
+}
+
+.accounting-stage-card--transfer .accounting-actions-row {
+  margin-top: 8px;
+}
+
+.accounting-stage-card--transfer .accounting-outline-button,
+.accounting-stage-card--transfer .accounting-primary-button {
+  min-height: 36px;
+  padding-left: 14px;
+  padding-right: 14px;
+  font-size: 13px;
+}
+
+html[data-theme="dark"] .accounting-page-header h2,
+html[data-theme="dark"] .accounting-stage-card h3,
+html[data-theme="dark"] .accounting-mini-card h4,
+html[data-theme="dark"] .accounting-labeled-entry span,
+html[data-theme="dark"] .accounting-checkline,
+html[data-theme="dark"] .accounting-provider-select-wrap {
+  color: var(--text-title, #f8f7ff);
+}
+
+html[data-theme="dark"] .accounting-stage-card,
+html[data-theme="dark"] .accounting-mini-card,
+html[data-theme="dark"] .accounting-template-row,
+html[data-theme="dark"] .accounting-loading-card,
+html[data-theme="dark"] .accounting-outline-button,
+html[data-theme="dark"] .accounting-progress__item--idle {
+  background: #181818;
+  border-color: #2c2c2c;
+}
+
+html[data-theme="dark"] .accounting-provider-select-wrap select,
+html[data-theme="dark"] .accounting-labeled-entry input {
+  background: #241d3d;
+  color: #ffffff;
+  border-color: #3c315f;
+}
+
+html[data-theme="dark"] .accounting-provider-select-wrap select {
+  border-left: none;
+}
+
+html[data-theme="dark"] .accounting-progress__item--done {
+  background: rgba(139, 92, 246, 0.12);
+  color: #c4b5fd;
+  border-color: rgba(139, 92, 246, 0.25);
+}
+
+html[data-theme="dark"] .accounting-progress__item--active {
+  background: var(--color-primary, #8b5cf6);
+  color: #ffffff;
+  border-color: var(--color-primary, #8b5cf6);
+}
+
+html[data-theme="dark"] .accounting-alert-card--info {
+  background: #111c35;
+  color: #8fb3ff;
+  border-color: #2e56b8;
+}
+
+html[data-theme="dark"] .accounting-alert-card--warn {
+  background: #2a210e;
+  color: #f6c56b;
+  border-color: #8b6418;
+}
+
+html[data-theme="dark"] .accounting-alert-card--danger {
+  background: #2b1116;
+  color: #ff9eaa;
+  border-color: #9c2a3b;
+}
+
+html[data-theme="dark"] .accounting-alert-card--success {
+  background: #10251a;
+  color: #75e1a0;
+  border-color: #277a45;
+}
+
+html[data-theme="dark"] .accounting-connection-status--success {
+  background: #10251a;
+  color: #75e1a0;
+  border-color: #277a45;
+}
+
+html[data-theme="dark"] .accounting-connection-status--warn {
+  background: #2a210e;
+  color: #f6c56b;
+  border-color: #8b6418;
+}
+
+@media (max-width: 1180px) {
+  .accounting-progress,
+  .accounting-two-column-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .accounting-stage-one-form,
+  .accounting-output-row {
+    grid-template-columns: 1fr;
+  }
+
+  .accounting-provider-select-wrap,
+  .accounting-output-row .accounting-primary-button {
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 760px) {
+  .accounting-settings {
+    height: auto;
+    overflow: visible;
+  }
+
+  .settings-page:has(.accounting-settings),
+  .settings-content:has(.accounting-settings) {
+    overflow: auto !important;
+  }
+
+  .accounting-page-header,
+  .accounting-progress,
+  .accounting-two-column-grid,
+  .accounting-entry-grid--ids,
+  .accounting-entry-grid--defaults,
+  .accounting-import-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .accounting-stage-card {
+    height: auto;
+    padding: 18px 16px;
+  }
+
+  .accounting-import-buttons__wide,
+  .accounting-wide-button,
+  .accounting-actions-row__primary-wide {
+    justify-self: stretch;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .accounting-actions-row,
+  .accounting-actions-row--single,
+  .accounting-actions-row--split,
+  .accounting-actions-row--transfer,
+  .accounting-actions-row__right,
+  .accounting-actions-row__left,
+  .accounting-actions-row__left--attached {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    margin-right: 0;
+    direction: rtl;
+  }
+
+  .accounting-provider-select-wrap,
+  .accounting-template-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 761px) {
+  .accounting-settings {
+    height: calc(100vh - 92px);
+  }
+
+  .accounting-page-header,
+  .accounting-progress {
+    margin-bottom: 7px;
+  }
+
+  .accounting-progress__item {
+    min-height: 36px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
+  .accounting-stage-card {
+    padding: 14px 22px 12px;
+  }
+
+  .accounting-stage-card__subtitle {
+    margin-bottom: 7px;
+  }
+
+  .accounting-alert-card {
+    margin-bottom: 8px;
+  }
+
+  .accounting-alert-card__title {
+    padding-top: 8px;
+  }
+
+  .accounting-alert-card__lines p {
+    margin-bottom: 3px;
+    line-height: 1.6;
+  }
+
+  .accounting-mini-card h4 {
+    padding-top: 8px;
+  }
+
+  .accounting-mini-card__body {
+    padding-bottom: 9px;
+  }
+}

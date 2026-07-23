@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+
+.settings-sidebar {
+  font-family: 'Vazirmatn', sans-serif;
+  direction: rtl;
+  width: 262px;
+  height: 100vh;
+  min-height: 100vh;
+  background: var(--settings-sidebar-bg);
+  color: var(--settings-sidebar-text);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.settings-sidebar,
+.settings-sidebar * {
+  box-sizing: border-box;
+}
+
+.settings-sidebar__header {
+  height: 138px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.settings-sidebar__title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.settings-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+}
+
+.settings-sidebar__item {
+  width: 100%;
+  min-height: 74px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.62);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  direction: rtl;
+  text-align: right;
+  transition: background 0.18s, color 0.18s;
+}
+
+.settings-sidebar__item:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.settings-sidebar__item.active {
+  color: #ffffff;
+  background: var(--settings-sidebar-active-bg);
+  font-weight: 800;
+}
+
+.settings-sidebar__item-label {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.settings-sidebar__item-arrow {
+  flex-shrink: 0;
+  width: 18px;
+  font-size: 22px;
+  line-height: 1;
+  color: currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

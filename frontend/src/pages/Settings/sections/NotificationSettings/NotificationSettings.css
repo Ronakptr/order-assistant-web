@@ -1,0 +1,388 @@
+.notification-settings {
+  width: 100%;
+  min-height: 0;
+  direction: rtl;
+  font-family: "Vazirmatn", sans-serif;
+  color: var(--text-main, #111827);
+}
+
+.notification-settings,
+.notification-settings * {
+  box-sizing: border-box;
+}
+
+.notification-settings__card {
+  width: 100%;
+  min-height: 0;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e4e7ff);
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft, 0 2px 14px rgba(17, 24, 39, 0.06));
+  padding: 22px;
+  overflow: hidden;
+}
+
+.notification-settings__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.notification-settings__header h2 {
+  margin: 0 0 5px;
+  color: var(--text-title, #111827);
+  font-size: 21px;
+  font-weight: 950;
+  line-height: 1.25;
+}
+
+.notification-settings__header p {
+  margin: 0;
+  color: var(--text-soft, #7b7fc4);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.notification-settings__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notification-primary-btn,
+.notification-secondary-btn,
+.notification-role-panel__tools button {
+  height: 36px;
+  border-radius: 12px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.notification-primary-btn {
+  border: none;
+  background: var(--color-primary, #250299);
+  color: #ffffff;
+}
+
+.notification-secondary-btn,
+.notification-role-panel__tools button {
+  border: 1px solid var(--border-color, #e4e7ff);
+  background: var(--settings-section-bg, #fbfbff);
+  color: var(--color-primary, #250299);
+}
+
+.notification-primary-btn:disabled,
+.notification-secondary-btn:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
+.notification-loading {
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft, #7b7fc4);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.notification-status {
+  margin-bottom: 13px;
+  border-radius: 14px;
+  padding: 10px 13px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.8;
+}
+
+.notification-status--success {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+  border: 1px solid rgba(34, 197, 94, 0.34);
+}
+
+.notification-status--danger {
+  background: rgba(239, 68, 68, 0.11);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+.notification-status--info {
+  background: rgba(37, 2, 153, 0.055);
+  color: var(--color-primary, #250299);
+  border: 1px solid rgba(37, 2, 153, 0.14);
+}
+
+.notification-compact-layout {
+  display: grid;
+  grid-template-columns: 235px minmax(0, 1fr);
+  gap: 14px;
+  min-height: 420px;
+}
+
+.notification-role-list {
+  min-width: 0;
+  border: 1px solid var(--border-color, #e4e7ff);
+  border-radius: 18px;
+  background: var(--settings-section-bg, #fbfbff);
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: 9px;
+}
+
+.notification-role-card {
+  position: relative;
+  min-width: 0;
+  min-height: 72px;
+  border: 1px solid var(--border-color, #e4e7ff);
+  border-radius: 15px;
+  background: var(--card-bg, #ffffff);
+  padding: 11px;
+  text-align: right;
+  cursor: pointer;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.notification-role-card.is-active {
+  border-color: var(--color-primary, #250299);
+  background: rgba(37, 2, 153, 0.065);
+}
+
+.notification-role-card strong {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-title, #111827);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.notification-role-card span {
+  display: block;
+  color: var(--text-soft, #7b7fc4);
+  font-size: 10.8px;
+  font-weight: 850;
+}
+
+.notification-role-card i {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--color-primary, #250299);
+  border-radius: 999px 0 0 999px;
+}
+
+.notification-role-panel {
+  min-width: 0;
+  border: 1px solid var(--border-color, #e4e7ff);
+  border-radius: 18px;
+  background: var(--settings-section-bg, #fbfbff);
+  padding: 14px;
+}
+
+.notification-role-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.notification-role-panel__head span {
+  display: block;
+  color: var(--text-soft, #7b7fc4);
+  font-size: 10.8px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.notification-role-panel__head h3 {
+  margin: 0;
+  color: var(--text-title, #111827);
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.notification-role-panel__tools {
+  display: flex;
+  gap: 8px;
+}
+
+.notification-mini-summary {
+  min-height: 54px;
+  border: 1px dashed rgba(37, 2, 153, 0.24);
+  border-radius: 15px;
+  background: rgba(37, 2, 153, 0.045);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  margin-bottom: 11px;
+}
+
+.notification-mini-summary strong {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: var(--color-primary, #250299);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.notification-mini-summary span {
+  color: var(--text-soft, #7b7fc4);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.notification-category-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.notification-category-card {
+  min-width: 0;
+  min-height: 62px;
+  border: 1px solid var(--border-color, #e4e7ff);
+  border-radius: 15px;
+  background: var(--card-bg, #ffffff);
+  padding: 10px 11px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.notification-category-card.is-on {
+  border-color: rgba(37, 2, 153, 0.28);
+  background: rgba(37, 2, 153, 0.045);
+}
+
+.notification-category-card strong {
+  display: block;
+  color: var(--text-title, #111827);
+  font-size: 12.5px;
+  font-weight: 950;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notification-category-card span {
+  display: block;
+  color: var(--text-soft, #7b7fc4);
+  font-size: 10.2px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notification-compact-switch {
+  width: 42px;
+  height: 24px;
+  border: 1px solid var(--border-color, #e4e7ff);
+  border-radius: 999px;
+  background: #e5e7eb;
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.notification-compact-switch i {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  transition: transform 0.18s ease;
+}
+
+.notification-compact-switch.is-on {
+  background: var(--color-primary, #250299);
+  border-color: var(--color-primary, #250299);
+}
+
+.notification-compact-switch.is-on i {
+  transform: translateX(-18px);
+  background: #ffffff;
+  color: var(--color-primary, #250299);
+}
+
+html[data-theme="dark"] .notification-settings__card,
+html[data-theme="dark"] .notification-role-card,
+html[data-theme="dark"] .notification-category-card {
+  background: var(--card-bg, #1c1733);
+  border-color: var(--border-color, rgba(139, 111, 240, 0.24));
+}
+
+html[data-theme="dark"] .notification-role-list,
+html[data-theme="dark"] .notification-role-panel,
+html[data-theme="dark"] .notification-secondary-btn,
+html[data-theme="dark"] .notification-role-panel__tools button {
+  background: var(--input-bg, #241d3d);
+  border-color: var(--border-color, rgba(139, 111, 240, 0.24));
+}
+
+html[data-theme="dark"] .notification-secondary-btn,
+html[data-theme="dark"] .notification-role-panel__tools button {
+  color: var(--text-main, #f8f7ff);
+}
+
+@media (max-width: 1180px) {
+  .notification-compact-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-role-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .notification-settings__card {
+    padding: 16px;
+  }
+
+  .notification-settings__header,
+  .notification-role-panel__head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .notification-role-list,
+  .notification-category-list {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-settings__actions,
+  .notification-role-panel__tools {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

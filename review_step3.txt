@@ -1,0 +1,1982 @@
+﻿==================== backend\app\services\product_service.py ====================
+from datetime import datetime
+
+from sqlalchemy.orm import Session
+
+from app.models.product import Product
+from app.schemas.product import ProductCreate, ProductUpdate
+
+
+def list_products(db: Session, search: str | None = None) -> list[Product]:
+    query = db.query(Product).order_by(Product.id.desc())
+
+    if search:
+        pattern = f"%{search.strip()}%"
+        query = query.filter(
+            Product.name.ilike(pattern)
+            | Product.product_code.ilike(pattern)
+            | Product.sale_price.ilike(pattern)
+        )
+
+    return query.all()
+
+
+def get_product(db: Session, product_id: int) -> Product | None:
+    return db.query(Product).filter(Product.id == product_id).first()
+
+
+def get_product_by_code(db: Session, product_code: str) -> Product | None:
+    return db.query(Product).filter(Product.product_code == product_code).first()
+
+
+def create_product(db: Session, product_data: ProductCreate) -> Product:
+    product = Product(
+        **product_data.model_dump(),
+        updated_at=datetime.utcnow(),
+    )
+    db.add(product)
+    db.commit()
+    db.refresh(product)
+    return product
+
+
+def update_product(db: Session, product: Product, product_data: ProductUpdate) -> Product:
+    update_data = product_data.model_dump(exclude_unset=True)
+
+    for field, value in update_data.items():
+        setattr(product, field, value)
+
+    product.updated_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(product)
+    return product
+
+
+def delete_product(db: Session, product: Product) -> None:
+    db.delete(product)
+    db.commit()
+
+==================== backend\app\services\customer_service.py ====================
+from datetime import datetime
+
+from sqlalchemy.orm import Session
+
+from app.models.customer import Customer
+from app.schemas.customer import CustomerCreate, CustomerUpdate
+
+
+def list_customers(db: Session, search: str | None = None) -> list[Customer]:
+    query = db.query(Customer).order_by(Customer.id.desc())
+
+    if search:
+        pattern = f"%{search.strip()}%"
+        query = query.filter(
+            Customer.name.ilike(pattern)
+            | Customer.phone.ilike(pattern)
+            | Customer.customer_code.ilike(pattern)
+            | Customer.oa_internal_code.ilike(pattern)
+        )
+
+    return query.all()
+
+
+def get_customer(db: Session, customer_id: int) -> Customer | None:
+    return db.query(Customer).filter(Customer.id == customer_id).first()
+
+
+def get_customer_by_code(db: Session, customer_code: str) -> Customer | None:
+    return db.query(Customer).filter(Customer.customer_code == customer_code).first()
+
+
+def get_customer_by_oa_code(db: Session, oa_internal_code: str) -> Customer | None:
+    return db.query(Customer).filter(Customer.oa_internal_code == oa_internal_code).first()
+
+
+def create_customer(db: Session, customer_data: CustomerCreate) -> Customer:
+    customer = Customer(
+        **customer_data.model_dump(),
+        updated_at=datetime.utcnow(),
+    )
+    db.add(customer)
+    db.commit()
+    db.refresh(customer)
+    return customer
+
+
+def update_customer(db: Session, customer: Customer, customer_data: CustomerUpdate) -> Customer:
+    update_data = customer_data.model_dump(exclude_unset=True)
+
+    for field, value in update_data.items():
+        setattr(customer, field, value)
+
+    customer.updated_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(customer)
+    return customer
+
+
+def delete_customer(db: Session, customer: Customer) -> None:
+    db.delete(customer)
+    db.commit()
+
+==================== backend\app\services\order_service.py ====================
+from datetime import datetime
+from sqlalchemy.orm import Session, selectinload
+
+from app.models.order import Order, OrderItem
+from app.schemas.order import OrderCreate, OrderUpdate
+
+
+def _to_float(value) -> float:
+    try:
+        if value in (None, ""):
+            return 0.0
+        return float(str(value).replace(",", ""))
+    except Exception:
+        return 0.0
+
+
+def _status(data) -> str:
+    return data.status or data.orderStatus or data.statusLabel or "Ø«Ø¨Øªâ€ŒØ´Ø¯Ù‡"
+
+
+def _generate_order_code(db: Session) -> str:
+    last = db.query(Order).order_by(Order.id.desc()).first()
+    next_number = (last.id if last else 0) + 1
+    while True:
+        code = f"ORD-{next_number:04d}"
+        exists = db.query(Order).filter(Order.code == code).first()
+        if not exists:
+            return code
+        next_number += 1
+
+
+def _ensure_unique_code(db: Session, requested_code: str | None, current_order_id: int | None = None) -> str:
+    if requested_code:
+        existing = db.query(Order).filter(Order.code == requested_code).first()
+        if not existing or existing.id == current_order_id:
+            return requested_code
+    return _generate_order_code(db)
+
+
+def _order_item_from_schema(item, index: int) -> OrderItem:
+    return OrderItem(
+        sort_order=index,
+        line_uid=str(item.id) if item.id is not None else None,
+        product_name=item.name or "Ø¨Ø¯ÙˆÙ† Ù†Ø§Ù…",
+        quantity_method=item.quantityMethod,
+        quantity_value_raw=item.quantityValueRaw,
+        add_quantity_method=item.addQuantityMethod,
+        add_quantity_raw=item.addQuantityRaw,
+        final_quantity_raw=item.finalQuantityRaw,
+        quantity_number=_to_float(item.quantityNumber),
+        quantity_text=item.quantity,
+        count_display=item.countDisplay,
+        weight=item.weight,
+        length=item.length,
+        unit_price_raw=item.unitPriceRaw,
+        unit_price_text=item.unitPrice,
+        total_text=item.total,
+        total_raw=_to_float(item.totalRaw),
+        specs=item.specs,
+        notes=item.notes,
+    )
+
+
+def _apply_order_data(db: Session, order: Order, data: OrderCreate | OrderUpdate, is_new: bool = False) -> Order:
+    order.code = _ensure_unique_code(db, data.code, None if is_new else order.id)
+    order.customer_name = data.customer or "Ø¨Ø¯ÙˆÙ† Ù†Ø§Ù…"
+    order.customer_phone = data.phone
+    order.customer_quality = data.customerQuality
+    order.status = _status(data)
+    order.order_date_text = data.date
+    order.order_date_input = data.dateInputValue
+    order.invoice_description = data.invoiceDescription
+    order.total_text = data.total
+    order.total_raw = _to_float(data.totalRaw)
+    order.prepayment_text = data.prepayment
+    order.prepayment_raw = _to_float(data.prepaymentRaw)
+    order.remaining_text = data.remaining
+    order.remaining_raw = _to_float(data.remainingRaw)
+    order.updated_at = datetime.utcnow()
+
+    order.items.clear()
+    for index, item in enumerate(data.items or []):
+        order.items.append(_order_item_from_schema(item, index))
+    return order
+
+
+def order_to_out(order: Order) -> dict:
+    items = []
+    for item in order.items or []:
+        items.append({
+            "id": item.line_uid or item.id,
+            "name": item.product_name,
+            "customer": order.customer_name,
+            "date": order.order_date_text or "",
+            "quantityMethod": item.quantity_method,
+            "quantityValueRaw": item.quantity_value_raw,
+            "addQuantityMethod": item.add_quantity_method,
+            "addQuantityRaw": item.add_quantity_raw,
+            "finalQuantityRaw": item.final_quantity_raw,
+            "quantityNumber": item.quantity_number,
+            "quantity": item.quantity_text,
+            "countDisplay": item.count_display,
+            "weight": item.weight,
+            "length": item.length,
+            "unitPriceRaw": item.unit_price_raw,
+            "unitPrice": item.unit_price_text,
+            "total": item.total_text,
+            "totalRaw": item.total_raw,
+            "specs": item.specs,
+            "notes": item.notes,
+        })
+
+    return {
+        "uid": order.id,
+        "code": order.code,
+        "customer": order.customer_name,
+        "phone": order.customer_phone,
+        "customerQuality": order.customer_quality,
+        "items": items,
+        "status": order.status,
+        "orderStatus": order.status,
+        "statusLabel": order.status,
+        "date": order.order_date_text,
+        "dateInputValue": order.order_date_input,
+        "invoiceDescription": order.invoice_description,
+        "total": order.total_text,
+        "totalRaw": order.total_raw,
+        "prepayment": order.prepayment_text,
+        "prepaymentRaw": order.prepayment_raw,
+        "remaining": order.remaining_text,
+        "remainingRaw": order.remaining_raw,
+    }
+
+
+def list_orders(db: Session, search: str | None = None) -> list[dict]:
+    query = db.query(Order).options(selectinload(Order.items)).order_by(Order.id.desc())
+    if search:
+        pattern = f"%{search.strip()}%"
+        query = query.filter(
+            Order.code.ilike(pattern) |
+            Order.customer_name.ilike(pattern) |
+            Order.status.ilike(pattern) |
+            Order.order_date_text.ilike(pattern)
+        )
+    return [order_to_out(order) for order in query.all()]
+
+
+def get_order(db: Session, order_id: str) -> Order | None:
+    query = db.query(Order).options(selectinload(Order.items))
+    if str(order_id).isdigit():
+        by_id = query.filter(Order.id == int(order_id)).first()
+        if by_id:
+            return by_id
+    return query.filter(Order.code == str(order_id)).first()
+
+
+def create_order(db: Session, data: OrderCreate) -> dict:
+    order = Order(
+        code=_generate_order_code(db),
+        customer_name=data.customer or "Ø¨Ø¯ÙˆÙ† Ù†Ø§Ù…",
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    _apply_order_data(db, order, data, is_new=True)
+    db.add(order)
+    db.commit()
+    db.refresh(order)
+    order = get_order(db, str(order.id))
+    return order_to_out(order)
+
+
+def update_order(db: Session, order: Order, data: OrderUpdate) -> dict:
+    _apply_order_data(db, order, data, is_new=False)
+    db.commit()
+    db.refresh(order)
+    order = get_order(db, str(order.id))
+    return order_to_out(order)
+
+
+def delete_order(db: Session, order: Order) -> None:
+    db.delete(order)
+    db.commit()
+
+==================== backend\app\services\message_service.py ====================
+from datetime import datetime
+import json
+
+from sqlalchemy.orm import Session
+
+from app.models.message import Message
+from app.schemas.message import MessageCreate, MessageUpdate
+
+
+def _safe_items(items_json: str | None) -> list[dict]:
+    if not items_json:
+        return []
+    try:
+        value = json.loads(items_json)
+        return value if isinstance(value, list) else []
+    except Exception:
+        return []
+
+
+def _format_date(value) -> str:
+    if not value:
+        return ""
+    try:
+        return value.strftime("%Y/%m/%d")
+    except Exception:
+        return str(value)
+
+
+def _make_message_code(db: Session) -> str:
+    count = db.query(Message).count() + 1
+    while True:
+        code = f"MSG-{count:04d}"
+        existing = db.query(Message).filter(Message.message_code == code).first()
+        if not existing:
+            return code
+        count += 1
+
+
+def message_to_ui(message: Message) -> dict:
+    return {
+        "uid": message.id,
+        "id": message.message_code,
+        "orderCode": message.order_code or "",
+        "invoiceCode": message.invoice_code or message.order_code or "",
+        "customer": message.customer or "",
+        "phone": message.phone or "",
+        "email": message.email or "",
+        "items": _safe_items(message.items_json),
+        "status": message.status or "Ù¾ÛŒØ´ Ù†ÙˆÛŒØ³",
+        "template": message.template or "ØµÙˆØ±ØªØ­Ø³Ø§Ø¨",
+        "channel": message.channel or "Ù¾ÛŒØ§Ù…Ú©",
+        "date": _format_date(message.updated_at or message.created_at),
+        "preview": message.preview or "",
+    }
+
+
+def list_messages(db: Session, search: str | None = None) -> list[Message]:
+    query = db.query(Message).order_by(Message.id.desc())
+    if search:
+        pattern = f"%{search.strip()}%"
+        query = query.filter(
+            Message.message_code.ilike(pattern)
+            | Message.order_code.ilike(pattern)
+            | Message.customer.ilike(pattern)
+            | Message.status.ilike(pattern)
+            | Message.template.ilike(pattern)
+            | Message.channel.ilike(pattern)
+        )
+    return query.all()
+
+
+def get_message(db: Session, message_id: int) -> Message | None:
+    return db.query(Message).filter(Message.id == message_id).first()
+
+
+def create_message(db: Session, message_data: MessageCreate) -> Message:
+    now = datetime.utcnow()
+    message = Message(
+        message_code=message_data.message_code or _make_message_code(db),
+        order_code=message_data.order_code,
+        invoice_code=message_data.invoice_code or message_data.order_code,
+        customer=message_data.customer,
+        phone=message_data.phone,
+        email=message_data.email,
+        items_json=json.dumps(message_data.items or [], ensure_ascii=False),
+        status=message_data.status or "Ù¾ÛŒØ´ Ù†ÙˆÛŒØ³",
+        template=message_data.template,
+        channel=message_data.channel,
+        preview=message_data.preview,
+        created_at=now,
+        updated_at=now,
+    )
+    db.add(message)
+    db.commit()
+    db.refresh(message)
+    return message
+
+
+def update_message(db: Session, message: Message, message_data: MessageUpdate) -> Message:
+    update_data = message_data.model_dump(exclude_unset=True)
+
+    if "message_code" in update_data:
+        message.message_code = update_data["message_code"] or message.message_code
+    if "order_code" in update_data:
+        message.order_code = update_data["order_code"]
+    if "invoice_code" in update_data:
+        message.invoice_code = update_data["invoice_code"]
+    if "customer" in update_data:
+        message.customer = update_data["customer"]
+    if "phone" in update_data:
+        message.phone = update_data["phone"]
+    if "email" in update_data:
+        message.email = update_data["email"]
+    if "items" in update_data:
+        message.items_json = json.dumps(update_data["items"] or [], ensure_ascii=False)
+    if "status" in update_data:
+        message.status = update_data["status"] or message.status
+    if "template" in update_data:
+        message.template = update_data["template"]
+    if "channel" in update_data:
+        message.channel = update_data["channel"]
+    if "preview" in update_data:
+        message.preview = update_data["preview"]
+
+    message.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(message)
+    return message
+
+
+def delete_message(db: Session, message: Message) -> None:
+    db.delete(message)
+    db.commit()
+
+==================== backend\app\services\dashboard_service.py ====================
+from __future__ import annotations
+
+import re
+from datetime import date, datetime, timedelta
+from typing import Any
+
+from sqlalchemy import inspect, text
+from sqlalchemy.orm import Session
+
+
+PERSIAN_DIGITS = str.maketrans("Û°Û±Û²Û³Û´ÛµÛ¶Û·Û¸Û¹Ù Ù¡Ù¢Ù£Ù¤Ù¥Ù¦Ù§Ù¨Ù©", "01234567890123456789")
+
+ORDER_STATUS_ORDER = [
+    "Ù¾Ø±Ø¯Ø§Ø®Øª Ø´Ø¯Ù‡",
+    "Ø¯Ø± Ø§Ù†ØªØ¸Ø§Ø± Ù¾Ø±Ø¯Ø§Ø®Øª",
+    "Ù„ØºÙˆ Ø´Ø¯Ù‡",
+]
+
+
+def _table_exists(db: Session, table_name: str) -> bool:
+    return table_name in inspect(db.bind).get_table_names()
+
+
+def _fetch_all(db: Session, table_name: str) -> list[dict[str, Any]]:
+    if not _table_exists(db, table_name):
+        return []
+
+    rows = db.execute(text(f'SELECT * FROM "{table_name}"')).fetchall()
+    return [dict(row._mapping) for row in rows]
+
+
+def _safe_text(value: Any, default: str = "") -> str:
+    if value is None:
+        return default
+
+    text_value = str(value).strip()
+    return text_value if text_value else default
+
+
+def _safe_number(value: Any, default: float = 0.0) -> float:
+    if value is None:
+        return default
+
+    try:
+        if isinstance(value, str):
+            value = value.translate(PERSIAN_DIGITS)
+            value = value.replace(",", "").replace("ØŒ", "").strip()
+            value = re.sub(r"[^0-9.\-]", "", value)
+
+            if value in {"", "-", ".", "-."}:
+                return default
+
+        return float(value)
+    except Exception:
+        return default
+
+
+def _get_first(row: dict[str, Any], candidates: list[str], default: Any = None) -> Any:
+    for key in candidates:
+        if key in row and row.get(key) not in [None, ""]:
+            return row.get(key)
+
+    return default
+
+
+def _max_numeric_by_keywords(row: dict[str, Any], keywords: list[str]) -> float:
+    values = []
+
+    for key, value in row.items():
+        key_normalized = str(key).lower()
+
+        if any(keyword in key_normalized for keyword in keywords):
+            number = _safe_number(value, 0)
+
+            if number > 0:
+                values.append(number)
+
+    return max(values) if values else 0.0
+
+
+def _jalali_to_gregorian(jy: int, jm: int, jd: int) -> date | None:
+    try:
+        jy += 1595
+        days = (
+            -355668
+            + (365 * jy)
+            + ((jy // 33) * 8)
+            + (((jy % 33) + 3) // 4)
+            + jd
+            + (0 if jm < 7 else -6)
+            + ((jm - 1) * 31 if jm < 7 else ((jm - 7) * 30) + 186)
+        )
+
+        gy = 400 * (days // 146097)
+        days %= 146097
+
+        if days > 36524:
+            gy += 100 * ((days - 1) // 36524)
+            days = (days - 1) % 36524
+
+            if days >= 365:
+                days += 1
+
+        gy += 4 * (days // 1461)
+        days %= 1461
+
+        if days > 365:
+            gy += (days - 1) // 365
+            days = (days - 1) % 365
+
+        gd = days + 1
+
+        month_days = [
+            0,
+            31,
+            29 if (gy % 4 == 0 and gy % 100 != 0) or (gy % 400 == 0) else 28,
+            31,
+            30,
+            31,
+            30,
+            31,
+            31,
+            30,
+            31,
+            30,
+            31,
+        ]
+
+        gm = 1
+
+        while gm <= 12 and gd > month_days[gm]:
+            gd -= month_days[gm]
+            gm += 1
+
+        return date(gy, gm, gd)
+    except Exception:
+        return None
+
+
+def _parse_date(value: Any) -> date | None:
+    if value is None:
+        return None
+
+    if isinstance(value, datetime):
+        return value.date()
+
+    if isinstance(value, date):
+        return value
+
+    text_value = str(value).translate(PERSIAN_DIGITS).strip()
+
+    if not text_value:
+        return None
+
+    match = re.search(r"(\d{4})[-/](\d{1,2})[-/](\d{1,2})", text_value)
+
+    if match:
+        year = int(match.group(1))
+        month = int(match.group(2))
+        day = int(match.group(3))
+
+        if 1200 <= year <= 1600:
+            return _jalali_to_gregorian(year, month, day)
+
+        try:
+            return date(year, month, day)
+        except Exception:
+            pass
+
+    text_value = text_value.replace("Z", "").split("+")[0].strip()
+
+    formats = [
+        "%Y-%m-%d",
+        "%Y/%m/%d",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y/%m/%d %H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S.%f",
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(text_value[:26], fmt).date()
+        except Exception:
+            pass
+
+    return None
+
+
+def _normalize_text(value: Any) -> str:
+    text_value = str(value or "").lower()
+    text_value = text_value.replace("ÙŠ", "ÛŒ").replace("Ùƒ", "Ú©")
+    text_value = text_value.replace("â€Œ", " ")
+    text_value = re.sub(r"\s+", " ", text_value)
+    return text_value.strip()
+
+
+def _canonical_status(status: Any) -> str:
+    value = _normalize_text(status)
+
+    if any(keyword in value for keyword in ["Ù„ØºÙˆ", "cancelled", "canceled", "cancel"]):
+        return "Ù„ØºÙˆ Ø´Ø¯Ù‡"
+
+    if any(
+        keyword in value
+        for keyword in [
+            "Ù¾Ø±Ø¯Ø§Ø®Øª Ø´Ø¯Ù‡",
+            "ØªØ³ÙˆÛŒÙ‡ Ø´Ø¯Ù‡",
+            "ØªÚ©Ù…ÛŒÙ„",
+            "Ø§Ù†Ø¬Ø§Ù…",
+            "ØªÙ…Ø§Ù…",
+            "paid",
+            "settled",
+            "completed",
+            "complete",
+            "done",
+            "closed",
+        ]
+    ):
+        return "Ù¾Ø±Ø¯Ø§Ø®Øª Ø´Ø¯Ù‡"
+
+    return "Ø¯Ø± Ø§Ù†ØªØ¸Ø§Ø± Ù¾Ø±Ø¯Ø§Ø®Øª"
+
+
+def _is_closed_order(status: Any) -> bool:
+    return _canonical_status(status) in {"Ù¾Ø±Ø¯Ø§Ø®Øª Ø´Ø¯Ù‡", "Ù„ØºÙˆ Ø´Ø¯Ù‡"}
+
+
+def _product_name(product: dict[str, Any]) -> str:
+    return (
+        _safe_text(
+            _get_first(
+                product,
+                [
+                    "name",
+                    "product_name",
+                    "title",
+                    "product_title",
+                    "persian_name",
+                ],
+            )
+        )
+        or "Ù…Ø­ØµÙˆÙ„ Ø¨Ø¯ÙˆÙ† Ù†Ø§Ù…"
+    )
+
+
+def _product_unit(product: dict[str, Any]) -> str:
+    return _safe_text(
+        _get_first(
+            product,
+            [
+                "unit",
+                "quantity_unit",
+                "price_unit",
+                "measurement_unit",
+            ],
+        ),
+        "",
+    )
+
+
+def _product_price(product: dict[str, Any]) -> float:
+    direct = _safe_number(
+        _get_first(
+            product,
+            [
+                "sale_price",
+                "sales_price",
+                "selling_price",
+                "unit_price",
+                "price",
+                "default_sale_price",
+                "default_price",
+                "base_price",
+                "price_per_unit",
+                "unit_sale_price",
+                "product_price",
+            ],
+            0,
+        )
+    )
+
+    if direct > 0:
+        return direct
+
+    return _max_numeric_by_keywords(product, ["price", "amount", "total", "sale"])
+
+
+def _product_stock(product: dict[str, Any]) -> float:
+    return _safe_number(
+        _get_first(
+            product,
+            [
+                "remaining_stock",
+                "stock_quantity",
+                "stock",
+                "inventory",
+                "current_stock",
+                "quantity",
+                "qty",
+                "available_quantity",
+                "available_stock",
+            ],
+            0,
+        )
+    )
+
+
+def _product_warning_stock(product: dict[str, Any]) -> float:
+    return _safe_number(
+        _get_first(
+            product,
+            [
+                "warning_stock",
+                "stock_alert_level",
+                "low_stock_threshold",
+                "min_stock",
+                "minimum_stock",
+                "minimum_inventory",
+                "alert_stock",
+                "reorder_level",
+                "critical_stock",
+            ],
+            0,
+        )
+    )
+
+
+def _order_date(order: dict[str, Any]) -> date | None:
+    return _parse_date(
+        _get_first(
+            order,
+            [
+                "date",
+                "order_date",
+                "created_at",
+                "created_date",
+                "updated_at",
+            ],
+        )
+    )
+
+
+def _order_status(order: dict[str, Any]) -> str:
+    return _safe_text(
+        _get_first(order, ["status", "order_status", "payment_status"]),
+        "Ø¯Ø± Ø§Ù†ØªØ¸Ø§Ø± Ù¾Ø±Ø¯Ø§Ø®Øª",
+    )
+
+
+def _order_code(order: dict[str, Any]) -> str:
+    return (
+        _safe_text(_get_first(order, ["order_code", "code", "order_number"]))
+        or f"ORD-{order.get('id')}"
+    )
+
+
+def _customer_lookup(customers: list[dict[str, Any]]) -> dict[str, str]:
+    lookup: dict[str, str] = {}
+
+    for customer in customers:
+        customer_id = _safe_text(customer.get("id"))
+
+        if not customer_id:
+            continue
+
+        name = (
+            _safe_text(
+                _get_first(
+                    customer,
+                    [
+                        "name",
+                        "full_name",
+                        "customer_name",
+                        "title",
+                    ],
+                )
+            )
+            or "Ù…Ø´ØªØ±ÛŒ Ø¨Ø¯ÙˆÙ† Ù†Ø§Ù…"
+        )
+
+        lookup[customer_id] = name
+
+    return lookup
+
+
+def _order_customer_name(order: dict[str, Any], customers: dict[str, str]) -> str:
+    direct_name = _safe_text(
+        _get_first(
+            order,
+            [
+                "customer_name",
+                "customer",
+                "client_name",
+                "buyer_name",
+            ],
+        )
+    )
+
+    if direct_name:
+        return direct_name
+
+    customer_id = _safe_text(order.get("customer_id"))
+
+    if customer_id and customer_id in customers:
+        return customers[customer_id]
+
+    return "-"
+
+
+def _order_direct_total(order: dict[str, Any]) -> float:
+    direct = _safe_number(
+        _get_first(
+            order,
+            [
+                "total",
+                "amount",
+                "total_amount",
+                "grand_total",
+                "final_total",
+                "final_amount",
+                "payable_amount",
+                "payable",
+                "net_amount",
+                "net_total",
+                "order_total",
+                "order_amount",
+                "total_price",
+                "final_price",
+                "invoice_total",
+                "invoice_amount",
+                "sum_total",
+                "subtotal",
+                "total_after_discount",
+                "final_total_price",
+                "total_final_price",
+                "calculated_total",
+            ],
+            0,
+        )
+    )
+
+    if direct > 0:
+        return direct
+
+    return _max_numeric_by_keywords(order, ["total", "amount", "price", "payable", "invoice", "final", "sum"])
+
+
+def _order_items_context(
+    db: Session,
+    products: list[dict[str, Any]],
+) -> tuple[dict[str, float], dict[str, int], dict[str, str], list[dict[str, Any]]]:
+    if not _table_exists(db, "order_items"):
+        return {}, {}, {}, []
+
+    items = _fetch_all(db, "order_items")
+
+    product_lookup: dict[str, dict[str, Any]] = {}
+
+    for product in products:
+        product_id = _safe_text(product.get("id"))
+        name = _product_name(product)
+        code = _safe_text(_get_first(product, ["code", "product_code", "sku"]))
+
+        info = {
+            "name": name,
+            "unit": _product_unit(product),
+            "price": _product_price(product),
+        }
+
+        if product_id:
+            product_lookup[product_id] = info
+
+        if name:
+            product_lookup[name] = info
+
+        if code:
+            product_lookup[code] = info
+
+    order_totals: dict[str, float] = {}
+    order_item_counts: dict[str, int] = {}
+    order_item_names: dict[str, list[str]] = {}
+    product_totals: dict[str, dict[str, Any]] = {}
+
+    for item in items:
+        order_id = _safe_text(_get_first(item, ["order_id", "orderId", "order"]))
+
+        if not order_id:
+            continue
+
+        product_id = _safe_text(
+            _get_first(item, ["product_id", "productId", "product", "product_code", "sku"])
+        )
+        item_product_name = _safe_text(_get_first(item, ["product_name", "name", "title"]))
+        product_info = product_lookup.get(product_id) or product_lookup.get(item_product_name) or {}
+
+        product_name = item_product_name or product_info.get("name") or "Ù…Ø­ØµÙˆÙ„ Ø¨Ø¯ÙˆÙ† Ù†Ø§Ù…"
+
+        quantity = _safe_number(
+            _get_first(
+                item,
+                [
+                    "quantity",
+                    "qty",
+                    "count",
+                    "item_quantity",
+                    "product_quantity",
+                    "amount_quantity",
+                ],
+                1,
+            ),
+            1,
+        )
+
+        if quantity <= 0:
+            quantity = 1
+
+        unit_price = _safe_number(
+            _get_first(
+                item,
+                [
+                    "unit_price",
+                    "price",
+                    "sale_price",
+                    "sales_price",
+                    "product_price",
+                    "selling_price",
+                ],
+                0,
+            )
+        )
+
+        if unit_price <= 0:
+            unit_price = _safe_number(product_info.get("price"), 0)
+
+        line_total = _safe_number(
+            _get_first(
+                item,
+                [
+                    "line_total",
+                    "total_price",
+                    "total_amount",
+                    "final_price",
+                    "amount",
+                    "subtotal",
+                    "sum",
+                    "row_total",
+                    "item_total",
+                ],
+                0,
+            )
+        )
+
+        if line_total <= 0:
+            line_total = _max_numeric_by_keywords(item, ["total", "amount", "final", "sum", "subtotal"])
+
+        if line_total <= 0:
+            line_total = quantity * unit_price
+
+        order_totals[order_id] = order_totals.get(order_id, 0.0) + line_total
+        order_item_counts[order_id] = order_item_counts.get(order_id, 0) + 1
+
+        order_item_names.setdefault(order_id, [])
+
+        if product_name and product_name not in order_item_names[order_id]:
+            order_item_names[order_id].append(product_name)
+
+        product_key = product_id or product_name
+
+        if product_key not in product_totals:
+            product_totals[product_key] = {
+                "product_id": product_id or None,
+                "name": product_name,
+                "count": 0,
+                "amount": 0.0,
+            }
+
+        product_totals[product_key]["count"] += quantity
+        product_totals[product_key]["amount"] += line_total
+
+    order_items_summary = {
+        order_id: "ØŒ ".join(names[:3]) if names else "-"
+        for order_id, names in order_item_names.items()
+    }
+
+    top_products = sorted(
+        product_totals.values(),
+        key=lambda row: (row.get("count", 0), row.get("amount", 0)),
+        reverse=True,
+    )[:7]
+
+    return order_totals, order_item_counts, order_items_summary, top_products
+
+
+def _order_total(order: dict[str, Any], order_item_totals: dict[str, float]) -> float:
+    direct_total = _order_direct_total(order)
+
+    if direct_total > 0:
+        return direct_total
+
+    order_id = _safe_text(order.get("id"))
+    return _safe_number(order_item_totals.get(order_id, 0))
+
+
+def _dashboard_anchor_date(orders: list[dict[str, Any]]) -> date:
+    parsed_dates = [_order_date(order) for order in orders]
+    parsed_dates = [item for item in parsed_dates if item is not None]
+
+    if parsed_dates:
+        return max(parsed_dates)
+
+    return date.today()
+
+
+def _add_months(source: date, months: int) -> date:
+    month = source.month - 1 + months
+    year = source.year + month // 12
+    month = month % 12 + 1
+
+    days_in_month = [
+        31,
+        29 if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0) else 28,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31,
+    ]
+
+    day = min(source.day, days_in_month[month - 1])
+    return date(year, month, day)
+
+
+def _period_bounds(period: str, anchor: date, offset: int = 0) -> tuple[date, date]:
+    if period == "yearly":
+        year = anchor.year + offset
+        start = date(year, 1, 1)
+        end = anchor if offset == 0 else date(year, 12, 31)
+        return start, end
+
+    if period == "monthly":
+        month_anchor = _add_months(anchor, offset)
+        start = date(month_anchor.year, month_anchor.month, 1)
+        next_month = _add_months(start, 1)
+        end = next_month - timedelta(days=1)
+
+        if offset == 0:
+            end = anchor
+
+        return start, end
+
+    if offset == 0:
+        end = anchor
+        start = anchor - timedelta(days=6)
+        return start, end
+
+    previous_end = anchor - timedelta(days=7)
+    previous_start = previous_end - timedelta(days=6)
+    return previous_start, previous_end
+
+
+def _in_range(item_date: date | None, start: date, end: date) -> bool:
+    if item_date is None:
+        return False
+
+    return start <= item_date <= end
+
+
+def _growth(current: float, previous: float) -> float:
+    if previous == 0:
+        return 0.0 if current == 0 else 100.0
+
+    return round(((current - previous) / previous) * 100, 1)
+
+
+def _period_totals(
+    orders: list[dict[str, Any]],
+    order_item_totals: dict[str, float],
+    period: str,
+    anchor: date,
+    offset: int = 0,
+) -> dict[str, float]:
+    start, end = _period_bounds(period, anchor, offset)
+    amount = 0.0
+    count = 0
+
+    for order in orders:
+        order_date = _order_date(order)
+
+        if _in_range(order_date, start, end):
+            count += 1
+            amount += _order_total(order, order_item_totals)
+
+    return {
+        "count": count,
+        "amount": amount,
+    }
+
+
+def _day_totals(
+    orders: list[dict[str, Any]],
+    order_item_totals: dict[str, float],
+    target_date: date,
+) -> dict[str, float]:
+    amount = 0.0
+    count = 0
+
+    for order in orders:
+        if _order_date(order) == target_date:
+            count += 1
+            amount += _order_total(order, order_item_totals)
+
+    return {
+        "count": count,
+        "amount": amount,
+    }
+
+
+def _orders_by_period(
+    orders: list[dict[str, Any]],
+    order_item_totals: dict[str, float],
+    period: str,
+    anchor: date,
+) -> list[dict[str, Any]]:
+    if period == "yearly":
+        rows = []
+
+        for month in range(1, anchor.month + 1):
+            current_count = 0
+            current_amount = 0.0
+
+            for order in orders:
+                order_date = _order_date(order)
+
+                if order_date and order_date.year == anchor.year and order_date.month == month:
+                    current_count += 1
+                    current_amount += _order_total(order, order_item_totals)
+
+            rows.append(
+                {
+                    "date": f"{anchor.year}-{month:02d}",
+                    "label": f"{month:02d}",
+                    "count": current_count,
+                    "amount": current_amount,
+                }
+            )
+
+        return rows
+
+    start_date, end_date = _period_bounds(period, anchor, 0)
+    days = (end_date - start_date).days + 1
+    rows = []
+
+    for offset in range(days):
+        current_date = start_date + timedelta(days=offset)
+        current_count = 0
+        current_amount = 0.0
+
+        for order in orders:
+            order_date = _order_date(order)
+
+            if order_date == current_date:
+                current_count += 1
+                current_amount += _order_total(order, order_item_totals)
+
+        rows.append(
+            {
+                "date": current_date.isoformat(),
+                "label": current_date.strftime("%m/%d"),
+                "count": current_count,
+                "amount": current_amount,
+            }
+        )
+
+    return rows
+
+
+def _stats(
+    orders: list[dict[str, Any]],
+    customers: list[dict[str, Any]],
+    products: list[dict[str, Any]],
+    messages: list[dict[str, Any]],
+    order_item_totals: dict[str, float],
+    period: str,
+    anchor: date,
+) -> dict[str, Any]:
+    total_amount = 0.0
+    paid_amount = 0.0
+    open_amount = 0.0
+    completed_orders = 0
+    open_orders = 0
+    low_stock_products = 0
+    out_of_stock_products = 0
+
+    for order in orders:
+        order_total = _order_total(order, order_item_totals)
+        status = _canonical_status(_order_status(order))
+
+        total_amount += order_total
+
+        if status in {"Ù¾Ø±Ø¯Ø§Ø®Øª Ø´Ø¯Ù‡", "Ù„ØºÙˆ Ø´Ø¯Ù‡"}:
+            completed_orders += 1
+            paid_amount += order_total
+        else:
+            open_orders += 1
+            open_amount += order_total
+
+    for product in products:
+        stock = _product_stock(product)
+        warning_stock = _product_warning_stock(product)
+
+        if warning_stock <= 0:
+            continue
+
+        if stock <= 0:
+            out_of_stock_products += 1
+        elif stock <= warning_stock:
+            low_stock_products += 1
+
+    today_messages = 0
+    previous_day_messages = 0
+
+    for message in messages:
+        message_date = _parse_date(
+            _get_first(message, ["date", "created_at", "created_date", "updated_at"])
+        )
+
+        if message_date == anchor:
+            today_messages += 1
+
+        if message_date == anchor - timedelta(days=1):
+            previous_day_messages += 1
+
+    period_current = _period_totals(orders, order_item_totals, period, anchor, 0)
+    period_previous = _period_totals(orders, order_item_totals, period, anchor, -1)
+    today_current = _day_totals(orders, order_item_totals, anchor)
+    today_previous = _day_totals(orders, order_item_totals, anchor - timedelta(days=1))
+
+    average_order_amount = (
+        period_current["amount"] / period_current["count"]
+        if period_current["count"]
+        else 0.0
+    )
+
+    return {
+        "total_orders": len(orders),
+        "period_orders": period_current["count"],
+        "today_orders": today_current["count"],
+        "open_orders": open_orders,
+        "pending_orders": open_orders,
+        "completed_orders": completed_orders,
+        "total_customers": len(customers),
+        "total_products": len(products),
+        "total_messages": len(messages),
+        "today_messages": today_messages,
+        "low_stock_products": low_stock_products,
+        "out_of_stock_products": out_of_stock_products,
+        "total_amount": total_amount,
+        "period_amount": period_current["amount"],
+        "today_amount": today_current["amount"],
+        "paid_amount": paid_amount,
+        "open_amount": open_amount,
+        "month_order_amount": period_current["amount"],
+        "average_order_amount": average_order_amount,
+        "anchor_date": anchor.isoformat(),
+        "growth": {
+            "period_amount": _growth(period_current["amount"], period_previous["amount"]),
+            "period_orders": _growth(period_current["count"], period_previous["count"]),
+            "today_amount": _growth(today_current["amount"], today_previous["amount"]),
+            "today_orders": _growth(today_current["count"], today_previous["count"]),
+            "today_messages": _growth(today_messages, previous_day_messages),
+            "open_orders": 0.0,
+        },
+    }
+
+
+def _product_alerts(products: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    alerts: list[dict[str, Any]] = []
+    out_items = []
+    low_items = []
+
+    for product in products:
+        stock = _product_stock(product)
+        warning_stock = _product_warning_stock(product)
+
+        if warning_stock <= 0:
+            continue
+
+        row = {
+            "id": product.get("id"),
+            "product_name": _product_name(product),
+            "stock_quantity": stock,
+            "stock_alert_level": warning_stock,
+            "unit": _product_unit(product),
+        }
+
+        if stock <= 0:
+            out_items.append(row)
+        elif stock <= warning_stock:
+            low_items.append(row)
+
+    if out_items:
+        alerts.append(
+            {
+                "type": "out_of_stock",
+                "severity": "critical",
+                "title": f"{len(out_items)} Ù…Ø­ØµÙˆÙ„ Ø¨Ø¯ÙˆÙ† Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ø§Ø³Øª",
+                "message": "Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ø§ÛŒÙ† Ù…Ø­ØµÙˆÙ„Ø§Øª ØªÙ…Ø§Ù… Ø´Ø¯Ù‡ Ø§Ø³Øª.",
+                "count": len(out_items),
+                "items": out_items[:6],
+            }
+        )
+
+    if low_items:
+        alerts.append(
+            {
+                "type": "low_stock",
+                "severity": "warning",
+                "title": f"{len(low_items)} Ù…Ø­ØµÙˆÙ„ Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ú©Ù… Ø¯Ø§Ø±Ø¯",
+                "message": "Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ø§ÛŒÙ† Ù…Ø­ØµÙˆÙ„Ø§Øª Ø¨Ù‡ Ø­Ø¯ Ù‡Ø´Ø¯Ø§Ø± Ø±Ø³ÛŒØ¯Ù‡ Ø§Ø³Øª.",
+                "count": len(low_items),
+                "items": low_items[:6],
+            }
+        )
+
+    return alerts
+
+
+def _order_alerts(
+    orders: list[dict[str, Any]],
+    customers: dict[str, str],
+    order_item_totals: dict[str, float],
+    order_item_counts: dict[str, int],
+) -> list[dict[str, Any]]:
+    open_orders = []
+    incomplete_orders = []
+
+    for order in orders:
+        status = _canonical_status(_order_status(order))
+
+        if status in {"Ù¾Ø±Ø¯Ø§Ø®Øª Ø´Ø¯Ù‡", "Ù„ØºÙˆ Ø´Ø¯Ù‡"}:
+            continue
+
+        order_id = _safe_text(order.get("id"))
+        total = _order_total(order, order_item_totals)
+        customer_name = _order_customer_name(order, customers)
+
+        open_orders.append(order)
+
+        missing = []
+
+        if customer_name == "-":
+            missing.append("Ù…Ø´ØªØ±ÛŒ")
+
+        if order_item_counts.get(order_id, 0) <= 0:
+            missing.append("Ø§Ù‚Ù„Ø§Ù… Ø³ÙØ§Ø±Ø´")
+
+        if total <= 0:
+            missing.append("Ù…Ø¨Ù„Øº Ù…Ø¹ØªØ¨Ø±")
+
+        if missing:
+            incomplete_orders.append(
+                {
+                    "id": order.get("id"),
+                    "order_code": _order_code(order),
+                    "customer_name": customer_name,
+                    "status": status,
+                    "missing": missing,
+                }
+            )
+
+    alerts: list[dict[str, Any]] = []
+
+    if open_orders:
+        alerts.append(
+            {
+                "type": "open_orders",
+                "severity": "info",
+                "title": f"{len(open_orders)} Ø³ÙØ§Ø±Ø´ Ø¯Ø± Ø§Ù†ØªØ¸Ø§Ø± Ù¾Ø±Ø¯Ø§Ø®Øª ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯",
+                "message": "Ø§ÛŒÙ† Ø³ÙØ§Ø±Ø´â€ŒÙ‡Ø§ Ù‡Ù†ÙˆØ² Ù¾Ø±Ø¯Ø§Ø®ØªØŒ ØªØ³ÙˆÛŒÙ‡ØŒ ØªÚ©Ù…ÛŒÙ„ ÛŒØ§ Ù„ØºÙˆ Ù†Ø´Ø¯Ù‡â€ŒØ§Ù†Ø¯.",
+                "count": len(open_orders),
+                "items": [
+                    {
+                        "id": order.get("id"),
+                        "order_code": _order_code(order),
+                        "customer_name": _order_customer_name(order, customers),
+                        "status": _canonical_status(_order_status(order)),
+                    }
+                    for order in open_orders[:6]
+                ],
+            }
+        )
+
+    if incomplete_orders:
+        alerts.append(
+            {
+                "type": "incomplete_orders",
+                "severity": "warning",
+                "title": f"{len(incomplete_orders)} Ø³ÙØ§Ø±Ø´ Ù†Ø§Ù‚Øµ Ø§Ø³Øª",
+                "message": "Ø¨Ø±Ø®ÛŒ Ø³ÙØ§Ø±Ø´â€ŒÙ‡Ø§ÛŒ Ø¨Ø§Ø²ØŒ Ù…Ø´ØªØ±ÛŒØŒ Ø§Ù‚Ù„Ø§Ù… ÛŒØ§ Ù…Ø¨Ù„Øº Ù…Ø¹ØªØ¨Ø± Ù†Ø¯Ø§Ø±Ù†Ø¯.",
+                "count": len(incomplete_orders),
+                "items": incomplete_orders[:6],
+            }
+        )
+
+    return alerts
+
+
+def _message_alerts(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    draft = []
+    pending = []
+    failed = []
+
+    for message in messages:
+        status = _normalize_text(message.get("status"))
+
+        if "Ø®Ø·Ø§" in status or "Ù†Ø§Ù…ÙˆÙÙ‚" in status or "failed" in status or "error" in status:
+            failed.append(message)
+        elif "Ù¾ÛŒØ´" in status or "draft" in status:
+            draft.append(message)
+        elif "Ø§Ù†ØªØ¸Ø§Ø±" in status or "pending" in status or "ØµÙ" in status:
+            pending.append(message)
+
+    alerts: list[dict[str, Any]] = []
+
+    if failed:
+        alerts.append(
+            {
+                "type": "failed_messages",
+                "severity": "warning",
+                "title": f"{len(failed)} Ù¾ÛŒØ§Ù… Ù†Ø§Ù…ÙˆÙÙ‚ ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯",
+                "message": "Ù¾ÛŒØ§Ù…â€ŒÙ‡Ø§ÛŒ Ù†Ø§Ù…ÙˆÙÙ‚ Ù†ÛŒØ§Ø² Ø¨Ù‡ Ø¨Ø±Ø±Ø³ÛŒ Ø¯Ø§Ø±Ù†Ø¯.",
+                "count": len(failed),
+            }
+        )
+
+    if draft:
+        alerts.append(
+            {
+                "type": "draft_messages",
+                "severity": "info",
+                "title": f"{len(draft)} Ù¾ÛŒØ§Ù… Ù¾ÛŒØ´â€ŒÙ†ÙˆÛŒØ³ ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯",
+                "message": "Ù¾ÛŒØ§Ù…â€ŒÙ‡Ø§ÛŒ Ù¾ÛŒØ´â€ŒÙ†ÙˆÛŒØ³ Ù‡Ù†ÙˆØ² Ø§Ø±Ø³Ø§Ù„ Ù†Ø´Ø¯Ù‡â€ŒØ§Ù†Ø¯.",
+                "count": len(draft),
+            }
+        )
+
+    if pending:
+        alerts.append(
+            {
+                "type": "pending_messages",
+                "severity": "info",
+                "title": f"{len(pending)} Ù¾ÛŒØ§Ù… Ø¯Ø± Ø§Ù†ØªØ¸Ø§Ø± Ø§Ø±Ø³Ø§Ù„ ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯",
+                "message": "Ù¾ÛŒØ§Ù…â€ŒÙ‡Ø§ÛŒ Ø¯Ø± Ø§Ù†ØªØ¸Ø§Ø± Ø§Ø±Ø³Ø§Ù„ Ø±Ø§ Ø¨Ø±Ø±Ø³ÛŒ Ú©Ù†ÛŒØ¯.",
+                "count": len(pending),
+            }
+        )
+
+    return alerts
+
+
+def _orders_by_status(orders: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    result = {status: 0 for status in ORDER_STATUS_ORDER}
+
+    for order in orders:
+        status = _canonical_status(_order_status(order))
+        result[status] = result.get(status, 0) + 1
+
+    return [{"status": status, "count": result.get(status, 0)} for status in ORDER_STATUS_ORDER]
+
+
+def _recent_orders(
+    orders: list[dict[str, Any]],
+    customers: dict[str, str],
+    order_item_totals: dict[str, float],
+    order_items_summary: dict[str, str],
+) -> list[dict[str, Any]]:
+    sorted_orders = sorted(
+        orders,
+        key=lambda order: (
+            _order_date(order) or date.min,
+            _safe_number(order.get("id"), 0),
+        ),
+        reverse=True,
+    )
+
+    result = []
+
+    for order in sorted_orders[:8]:
+        order_id = _safe_text(order.get("id"))
+
+        result.append(
+            {
+                "id": order.get("id"),
+                "order_code": _order_code(order),
+                "customer_name": _order_customer_name(order, customers),
+                "status": _canonical_status(_order_status(order)),
+                "date": _safe_text(
+                    _get_first(order, ["date", "order_date", "created_at", "created_date"]),
+                    "-",
+                ),
+                "items_summary": order_items_summary.get(order_id, "-"),
+                "total": _order_total(order, order_item_totals),
+                "amount": _order_total(order, order_item_totals),
+            }
+        )
+
+    return result
+
+
+def get_dashboard_summary(
+    db: Session,
+    current_user: Any = None,
+    period: str = "weekly",
+) -> dict[str, Any]:
+    if period not in {"weekly", "monthly", "yearly"}:
+        period = "weekly"
+
+    orders = _fetch_all(db, "orders")
+    customers = _fetch_all(db, "customers")
+    products = _fetch_all(db, "products")
+    messages = _fetch_all(db, "messages")
+
+    anchor = _dashboard_anchor_date(orders)
+    customers_map = _customer_lookup(customers)
+    order_item_totals, order_item_counts, order_items_summary, top_products = _order_items_context(db, products)
+
+    alerts: list[dict[str, Any]] = []
+    alerts.extend(_product_alerts(products))
+    alerts.extend(_order_alerts(orders, customers_map, order_item_totals, order_item_counts))
+    alerts.extend(_message_alerts(messages))
+
+    severity_rank = {
+        "critical": 0,
+        "warning": 1,
+        "info": 2,
+        "success": 3,
+    }
+
+    alerts = sorted(alerts, key=lambda alert: severity_rank.get(alert.get("severity", "info"), 9))
+
+    return {
+        "period": period,
+        "stats": _stats(
+            orders=orders,
+            customers=customers,
+            products=products,
+            messages=messages,
+            order_item_totals=order_item_totals,
+            period=period,
+            anchor=anchor,
+        ),
+        "charts": {
+            "orders_by_day": _orders_by_period(orders, order_item_totals, period, anchor),
+            "orders_by_status": _orders_by_status(orders),
+            "top_products": top_products,
+        },
+        "recent": {
+            "recent_orders": _recent_orders(orders, customers_map, order_item_totals, order_items_summary),
+            "recent_messages": messages[:5],
+            "recent_customers": customers[:5],
+        },
+        "alerts": alerts,
+        "generated_at": datetime.now().isoformat(),
+    }
+
+
+def dashboard_summary(
+    db: Session,
+    current_user: Any = None,
+    period: str = "weekly",
+) -> dict[str, Any]:
+    return get_dashboard_summary(db=db, current_user=current_user, period=period)
+
+
+def get_summary(
+    db: Session,
+    current_user: Any = None,
+    period: str = "weekly",
+) -> dict[str, Any]:
+    return get_dashboard_summary(db=db, current_user=current_user, period=period)
+
+==================== backend\app\services\auth_service.py ====================
+from sqlalchemy.orm import Session
+
+from app.core.security import hash_password, verify_password
+from app.models.user import User
+from app.schemas.user import UserCreate
+
+
+def normalize_username(username: str) -> str:
+    return (username or "").strip().lower()
+
+
+def get_user_by_username(db: Session, username: str) -> User | None:
+    normalized_username = normalize_username(username)
+    if not normalized_username:
+        return None
+
+    return db.query(User).filter(User.username == normalized_username).first()
+
+
+def get_user_by_id(db: Session, user_id: int) -> User | None:
+    return db.query(User).filter(User.id == user_id).first()
+
+
+def create_user(db: Session, user_data: UserCreate) -> User:
+    user = User(
+        username=normalize_username(user_data.username),
+        full_name=user_data.full_name,
+        role=user_data.role,
+        hashed_password=hash_password(user_data.password),
+        is_active=True,
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+
+def is_password_valid(password: str, hashed_password: str) -> bool:
+    if not password or not hashed_password:
+        return False
+
+    try:
+        return verify_password(password, hashed_password)
+    except Exception:
+        return False
+
+
+def authenticate_user(db: Session, username: str, password: str) -> User | None:
+    user = get_user_by_username(db, username)
+
+    if not user:
+        return None
+
+    if not is_password_valid(password=password, hashed_password=user.hashed_password):
+        return None
+
+    return user
+
+==================== backend\app\schemas\product.py ====================
+from pydantic import BaseModel, Field
+
+
+class ProductBase(BaseModel):
+    product_code: str | None = None
+    name: str = Field(min_length=1, max_length=200)
+
+    default_sale_price: str | None = None
+    base_price: str | None = None
+    unit_price: str | None = None
+    price: float = 0
+
+    factory_purchase_price: str | None = None
+    remaining_stock: str | None = None
+    warning_stock: str | None = None
+    sale_price: str | None = None
+
+    category: str | None = None
+    unit: str | None = None
+    stock_quantity: float = 0
+    pricing_basis: str | None = None
+    quantity_method: str | None = None
+    description: str | None = None
+
+    accounting_software: str | None = None
+    accounting_id: str | None = None
+    oa_internal_code: str | None = None
+
+    is_active: bool = True
+
+
+class ProductCreate(ProductBase):
+    pass
+
+
+class ProductUpdate(BaseModel):
+    product_code: str | None = None
+    name: str | None = None
+
+    default_sale_price: str | None = None
+    base_price: str | None = None
+    unit_price: str | None = None
+    price: float | None = None
+
+    factory_purchase_price: str | None = None
+    remaining_stock: str | None = None
+    warning_stock: str | None = None
+    sale_price: str | None = None
+
+    category: str | None = None
+    unit: str | None = None
+    stock_quantity: float | None = None
+    pricing_basis: str | None = None
+    quantity_method: str | None = None
+    description: str | None = None
+
+    accounting_software: str | None = None
+    accounting_id: str | None = None
+    oa_internal_code: str | None = None
+
+    is_active: bool | None = None
+
+
+class ProductOut(ProductBase):
+    id: int
+
+    model_config = {"from_attributes": True}
+
+==================== backend\app\schemas\customer.py ====================
+from pydantic import BaseModel, Field
+
+
+class CustomerBase(BaseModel):
+    customer_code: str | None = None
+    oa_internal_code: str | None = None
+    name: str = Field(min_length=1, max_length=200)
+    phone: str | None = None
+    quality: str | None = None
+    source_type: str | None = None
+    description: str | None = None
+    accounting_software: str | None = None
+    accounting_id: str | None = None
+    is_active: bool = True
+
+
+class CustomerCreate(CustomerBase):
+    pass
+
+
+class CustomerUpdate(BaseModel):
+    customer_code: str | None = None
+    oa_internal_code: str | None = None
+    name: str | None = None
+    phone: str | None = None
+    quality: str | None = None
+    source_type: str | None = None
+    description: str | None = None
+    accounting_software: str | None = None
+    accounting_id: str | None = None
+    is_active: bool | None = None
+
+
+class CustomerOut(CustomerBase):
+    id: int
+
+    model_config = {"from_attributes": True}
+
+==================== backend\app\schemas\order.py ====================
+from pydantic import BaseModel, Field
+
+
+class OrderItemBase(BaseModel):
+    id: str | int | None = None
+    name: str = Field(default="Ø¨Ø¯ÙˆÙ† Ù†Ø§Ù…")
+    customer: str | None = None
+    date: str | None = None
+    quantityMethod: str | None = None
+    quantityValueRaw: str | None = None
+    addQuantityMethod: str | None = None
+    addQuantityRaw: str | None = None
+    finalQuantityRaw: str | None = None
+    quantityNumber: float | int | str | None = 0
+    quantity: str | None = None
+    countDisplay: str | None = None
+    weight: str | None = None
+    length: str | None = None
+    unitPriceRaw: str | None = None
+    unitPrice: str | None = None
+    total: str | None = None
+    totalRaw: float | int | str | None = 0
+    specs: str | None = None
+    notes: str | None = None
+
+
+class OrderBase(BaseModel):
+    uid: str | int | str | None = None
+    code: str | None = None
+    customer: str = Field(default="Ø¨Ø¯ÙˆÙ† Ù†Ø§Ù…")
+    phone: str | None = None
+    customerQuality: str | None = None
+    items: list[OrderItemBase] = []
+    status: str | None = None
+    orderStatus: str | None = None
+    statusLabel: str | None = None
+    date: str | None = None
+    dateInputValue: str | None = None
+    invoiceDescription: str | None = None
+    total: str | None = None
+    totalRaw: float | int | str | None = 0
+    prepayment: str | None = None
+    prepaymentRaw: float | int | str | None = 0
+    remaining: str | None = None
+    remainingRaw: float | int | str | None = 0
+
+
+class OrderCreate(OrderBase):
+    pass
+
+
+class OrderUpdate(OrderBase):
+    pass
+
+
+class OrderOut(OrderBase):
+    uid: str | int
+    code: str
+
+
+==================== backend\app\schemas\message.py ====================
+from pydantic import BaseModel
+
+
+class MessageBase(BaseModel):
+    message_code: str | None = None
+    order_code: str | None = None
+    invoice_code: str | None = None
+    customer: str | None = None
+    phone: str | None = None
+    email: str | None = None
+    items: list[dict] = []
+    status: str = "Ù¾ÛŒØ´ Ù†ÙˆÛŒØ³"
+    template: str | None = None
+    channel: str | None = None
+    preview: str | None = None
+
+
+class MessageCreate(MessageBase):
+    pass
+
+
+class MessageUpdate(BaseModel):
+    message_code: str | None = None
+    order_code: str | None = None
+    invoice_code: str | None = None
+    customer: str | None = None
+    phone: str | None = None
+    email: str | None = None
+    items: list[dict] | None = None
+    status: str | None = None
+    template: str | None = None
+    channel: str | None = None
+    preview: str | None = None
+
+
+class MessageOut(MessageBase):
+    id: str | int
+    uid: str | int
+    date: str
+
+
+==================== backend\app\schemas\user.py ====================
+from pydantic import BaseModel, Field
+
+
+class UserCreate(BaseModel):
+    username: str = Field(min_length=3, max_length=80)
+    password: str = Field(min_length=6, max_length=128)
+    full_name: str | None = None
+    email: str | None = None
+    role: str = "user"
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    full_name: str | None = None
+    email: str | None = None
+    role: str
+    is_active: bool
+
+    model_config = {"from_attributes": True}
+
+
+class TokenUser(BaseModel):
+    id: int
+    username: str
+    full_name: str | None = None
+    email: str | None = None
+    role: str
+    is_active: bool
+
+
+class TokenOut(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: TokenUser
+
+==================== backend\app\database_migrations.py ====================
+from sqlalchemy import inspect, text
+from app.database import engine
+
+
+def _sqlite_add_column(table_name: str, column_name: str, column_definition: str) -> None:
+    inspector = inspect(engine)
+    existing_columns = {column["name"] for column in inspector.get_columns(table_name)}
+    if column_name in existing_columns:
+        return
+
+    with engine.begin() as connection:
+        connection.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_definition}"))
+
+
+def ensure_database_schema() -> None:
+    """Small SQLite-safe schema upgrades used during the web migration.
+
+    This avoids losing local data while the old desktop schema is being adapted.
+    Later we can replace this with Alembic migrations, but for the current fast
+    migration path this keeps the database compatible without manual edits.
+    """
+    if not str(engine.url).startswith("sqlite"):
+        return
+
+    inspector = inspect(engine)
+    table_names = set(inspector.get_table_names())
+
+    if "users" in table_names:
+        _sqlite_add_column("users", "email", "VARCHAR")
+        _sqlite_add_column("users", "updated_at", "DATETIME")
+
+    if "customers" in table_names:
+        _sqlite_add_column("customers", "updated_at", "DATETIME")
+
+    if "products" in table_names:
+        _sqlite_add_column("products", "updated_at", "DATETIME")
+

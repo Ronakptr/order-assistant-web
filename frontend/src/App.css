@@ -1,0 +1,1590 @@
+.oa-toast-stack {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 20000;
+  width: min(380px, calc(100vw - 28px));
+  display: grid;
+  gap: 10px;
+  pointer-events: none;
+  direction: rtl;
+}
+
+.oa-toast {
+  min-height: 54px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border-color, #e4e7ff);
+  border-radius: 16px;
+  background: var(--card-bg, #ffffff);
+  color: var(--text-main, #111827);
+  box-shadow: var(--shadow-popover, 0 24px 70px rgba(20, 20, 60, 0.18));
+  pointer-events: auto;
+  animation: oa-toast-in 0.22s ease-out;
+}
+
+.oa-toast__icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.oa-toast__content {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.oa-toast__content strong {
+  color: var(--text-title, #111827);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.oa-toast__content span {
+  color: var(--text-main, #111827);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.7;
+}
+
+.oa-toast__close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted, #9ca3af);
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.oa-toast__close:hover {
+  background: var(--surface-soft, #fafbff);
+  color: var(--text-main, #111827);
+}
+
+.oa-toast--success .oa-toast__icon {
+  background: var(--success-bg, #dcfce7);
+  color: var(--success-text, #15803d);
+}
+
+.oa-toast--error .oa-toast__icon {
+  background: var(--danger-bg, #fee2e2);
+  color: var(--danger-text, #dc2626);
+}
+
+.oa-toast--warning .oa-toast__icon {
+  background: var(--warning-bg, #fef3c7);
+  color: var(--warning-text, #b45309);
+}
+
+.oa-toast--info .oa-toast__icon {
+  background: var(--info-bg, #dbeafe);
+  color: var(--info-text, #1d4ed8);
+}
+
+@keyframes oa-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-16px) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+/* Better dark-mode coverage for pages that still have hard-coded light colors */
+html[data-theme="dark"] .dashboard-page {
+  --db-bg: var(--page-bg);
+  --db-card: var(--card-bg);
+  --db-primary: var(--color-primary);
+  --db-primary-2: #b8adff;
+  --db-primary-3: #c7d2fe;
+  --db-primary-soft: var(--color-primary-soft);
+  --db-text: var(--text-main);
+  --db-muted: var(--text-soft);
+  --db-border: var(--border-color);
+  --db-border-soft: rgba(184, 193, 227, 0.12);
+  --db-shadow: var(--shadow-card);
+}
+
+html[data-theme="dark"] .dashboard-card,
+html[data-theme="dark"] .dashboard-notification-popup,
+html[data-theme="dark"] .orders-table-wrap,
+html[data-theme="dark"] .chart-tooltip,
+html[data-theme="dark"] .notification-item {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+html[data-theme="dark"] .orders-table th,
+html[data-theme="dark"] .orders-table td {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+html[data-theme="dark"] .orders-table tbody tr:hover td,
+html[data-theme="dark"] .dashboard-bell-btn,
+html[data-theme="dark"] .subscription-pill,
+html[data-theme="dark"] .period-btn,
+html[data-theme="dark"] .period-label,
+html[data-theme="dark"] .summary-card__mini-box,
+html[data-theme="dark"] .quick-tile {
+  background: var(--surface-soft) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+html[data-theme="dark"] .products-page,
+html[data-theme="dark"] .customers-page,
+html[data-theme="dark"] .messages-page,
+html[data-theme="dark"] .users-page,
+html[data-theme="dark"] .orders-page,
+html[data-theme="dark"] .new-order-page,
+html[data-theme="dark"] .new-order,
+html[data-theme="dark"] .login-page,
+html[data-theme="dark"] .register-page {
+  background: var(--page-bg) !important;
+  color: var(--text-main) !important;
+}
+
+html[data-theme="dark"] .products-title,
+html[data-theme="dark"] .customers-title,
+html[data-theme="dark"] .messages-title,
+html[data-theme="dark"] .users-title,
+html[data-theme="dark"] .orders-title,
+html[data-theme="dark"] .customers-td,
+html[data-theme="dark"] .pt-cell,
+html[data-theme="dark"] .mt-cell,
+html[data-theme="dark"] .orders-td,
+html[data-theme="dark"] .users-td,
+html[data-theme="dark"] label,
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3 {
+  color: var(--text-main) !important;
+}
+
+html[data-theme="dark"] .products-search,
+html[data-theme="dark"] .customers-search,
+html[data-theme="dark"] .messages-search,
+html[data-theme="dark"] .orders-search,
+html[data-theme="dark"] .products-table-wrap,
+html[data-theme="dark"] .customers-table-wrap,
+html[data-theme="dark"] .messages-table-wrap,
+html[data-theme="dark"] .orders-table-wrap,
+html[data-theme="dark"] .users-table-wrap,
+html[data-theme="dark"] .products-pagination,
+html[data-theme="dark"] .customers-pagination,
+html[data-theme="dark"] .messages-pagination,
+html[data-theme="dark"] .orders-pagination,
+html[data-theme="dark"] .users-pagination,
+html[data-theme="dark"] .product-modal-box,
+html[data-theme="dark"] .customer-modal-box,
+html[data-theme="dark"] .message-modal-box,
+html[data-theme="dark"] .order-modal-box,
+html[data-theme="dark"] .user-modal-box,
+html[data-theme="dark"] .settings-content > section,
+html[data-theme="dark"] .settings-content > div,
+html[data-theme="dark"] .display-settings__card,
+html[data-theme="dark"] .currency-settings__card,
+html[data-theme="dark"] .security-settings__card,
+html[data-theme="dark"] .backup-card,
+html[data-theme="dark"] .date-settings-card,
+html[data-theme="dark"] .invoice-settings__options,
+html[data-theme="dark"] .invoice-settings__preview {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+html[data-theme="dark"] .products-table th,
+html[data-theme="dark"] .products-table td,
+html[data-theme="dark"] .customers-table th,
+html[data-theme="dark"] .customers-table td,
+html[data-theme="dark"] .messages-table th,
+html[data-theme="dark"] .messages-table td,
+html[data-theme="dark"] .orders-table th,
+html[data-theme="dark"] .orders-table td,
+html[data-theme="dark"] .users-table th,
+html[data-theme="dark"] .users-table td,
+html[data-theme="dark"] .products-row,
+html[data-theme="dark"] .customers-row,
+html[data-theme="dark"] .mt-row,
+html[data-theme="dark"] .orders-row,
+html[data-theme="dark"] .users-row,
+html[data-theme="dark"] .products-th,
+html[data-theme="dark"] .customers-th,
+html[data-theme="dark"] .messages-th,
+html[data-theme="dark"] .orders-th,
+html[data-theme="dark"] .users-th,
+html[data-theme="dark"] .pt-row,
+html[data-theme="dark"] .pt-cell {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .customer-modal-input,
+html[data-theme="dark"] .product-modal-input,
+html[data-theme="dark"] .message-modal-input,
+html[data-theme="dark"] .setting-number-input,
+html[data-theme="dark"] .currency-select,
+html[data-theme="dark"] .security-field input,
+html[data-theme="dark"] .password-input-wrap input,
+html[data-theme="dark"] .date-settings-manual-field input,
+html[data-theme="dark"] .date-settings-format-row select {
+  background: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--border-color) !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: var(--input-placeholder) !important;
+}
+
+html[data-theme="dark"] .customers-row:hover,
+html[data-theme="dark"] .pt-row:hover,
+html[data-theme="dark"] .mt-row:hover,
+html[data-theme="dark"] .orders-row:hover,
+html[data-theme="dark"] .users-row:hover {
+  background: rgba(255, 255, 255, 0.035) !important;
+}
+
+html[data-theme="dark"] .currency-preview,
+html[data-theme="dark"] .date-settings-mini-preview,
+html[data-theme="dark"] .date-settings-segment,
+html[data-theme="dark"] .font-size-control,
+html[data-theme="dark"] .segmented-control,
+html[data-theme="dark"] .security-row,
+html[data-theme="dark"] .invoice-accordion,
+html[data-theme="dark"] .invoice-field {
+  background: var(--surface-soft) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-paper {
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+html[data-theme="dark"] .invoice-preview-paper * {
+  color: inherit;
+}
+
+@media (max-width: 640px) {
+  .oa-toast-stack {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+  }
+
+  .oa-toast {
+    grid-template-columns: 30px minmax(0, 1fr) 28px;
+    border-radius: 14px;
+  }
+}
+
+/* Stage 3: brand dark palette refinement */
+html[data-theme="dark"] .dashboard-page {
+  --db-bg: var(--bg-base, #100c1f) !important;
+  --db-card: var(--bg-surface, #1a1530) !important;
+  --db-primary: var(--accent, #8b6ff0) !important;
+  --db-primary-2: var(--accent-hover, #9c85f5) !important;
+  --db-primary-3: var(--text-secondary, #9c93be) !important;
+  --db-primary-soft: rgba(139, 111, 240, 0.16) !important;
+  --db-text: var(--text-primary, #edeaf8) !important;
+  --db-muted: var(--text-secondary, #9c93be) !important;
+  --db-border: var(--border, #2a2447) !important;
+  --db-border-soft: var(--border, #2a2447) !important;
+  --db-shadow: var(--shadow-card) !important;
+}
+
+html[data-theme="dark"] .dashboard-card,
+html[data-theme="dark"] .dashboard-notification-popup,
+html[data-theme="dark"] .orders-table-wrap,
+html[data-theme="dark"] .chart-tooltip,
+html[data-theme="dark"] .notification-item,
+html[data-theme="dark"] .products-table-wrap,
+html[data-theme="dark"] .customers-table-wrap,
+html[data-theme="dark"] .messages-table-wrap,
+html[data-theme="dark"] .users-table-wrap,
+html[data-theme="dark"] .products-pagination,
+html[data-theme="dark"] .customers-pagination,
+html[data-theme="dark"] .messages-pagination,
+html[data-theme="dark"] .orders-pagination,
+html[data-theme="dark"] .users-pagination,
+html[data-theme="dark"] .product-modal-box,
+html[data-theme="dark"] .customer-modal-box,
+html[data-theme="dark"] .message-modal-box,
+html[data-theme="dark"] .order-modal-box,
+html[data-theme="dark"] .user-modal-box,
+html[data-theme="dark"] .settings-content > section,
+html[data-theme="dark"] .settings-content > div,
+html[data-theme="dark"] .display-settings__card,
+html[data-theme="dark"] .currency-settings__card,
+html[data-theme="dark"] .security-settings__card,
+html[data-theme="dark"] .backup-card,
+html[data-theme="dark"] .date-settings-card,
+html[data-theme="dark"] .invoice-settings__options,
+html[data-theme="dark"] .invoice-settings__preview {
+  background: var(--bg-surface, #1a1530) !important;
+  border-color: var(--border, #2a2447) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .orders-table tbody tr:hover td,
+html[data-theme="dark"] .dashboard-bell-btn,
+html[data-theme="dark"] .subscription-pill,
+html[data-theme="dark"] .period-btn,
+html[data-theme="dark"] .period-label,
+html[data-theme="dark"] .summary-card__mini-box,
+html[data-theme="dark"] .quick-tile,
+html[data-theme="dark"] .currency-preview,
+html[data-theme="dark"] .date-settings-mini-preview,
+html[data-theme="dark"] .date-settings-segment,
+html[data-theme="dark"] .font-size-control,
+html[data-theme="dark"] .segmented-control,
+html[data-theme="dark"] .security-row,
+html[data-theme="dark"] .invoice-accordion,
+html[data-theme="dark"] .invoice-field {
+  background: var(--bg-surface-2, #241d40) !important;
+  border-color: var(--border, #2a2447) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .customer-badge.active,
+html[data-theme="dark"] .status-badge.paid,
+html[data-theme="dark"] .status-badge.active,
+html[data-theme="dark"] .product-status-badge.active,
+html[data-theme="dark"] .user-status-badge.active,
+html[data-theme="dark"] .order-status-row--paid {
+  background: var(--success-bg, #12301f) !important;
+  color: var(--success-text, #4ade80) !important;
+  border-color: rgba(74, 222, 128, 0.25) !important;
+}
+
+html[data-theme="dark"] .status-badge.pending,
+html[data-theme="dark"] .status-badge.registered,
+html[data-theme="dark"] .status-badge.draft,
+html[data-theme="dark"] .order-status-row--pending {
+  background: var(--warning-bg, #2e2410) !important;
+  color: var(--warning-text, #fbbf24) !important;
+  border-color: rgba(251, 191, 36, 0.25) !important;
+}
+
+html[data-theme="dark"] .customer-badge.inactive,
+html[data-theme="dark"] .status-badge.cancelled,
+html[data-theme="dark"] .status-badge.canceled,
+html[data-theme="dark"] .product-status-badge.inactive,
+html[data-theme="dark"] .user-status-badge.inactive,
+html[data-theme="dark"] .order-status-row--cancelled {
+  background: var(--danger-bg, #2e1416) !important;
+  color: var(--danger-text, #f87171) !important;
+  border-color: rgba(248, 113, 113, 0.25) !important;
+}
+
+html[data-theme="dark"] .customer-add-btn,
+html[data-theme="dark"] .product-add-btn,
+html[data-theme="dark"] .message-add-btn,
+html[data-theme="dark"] .orders-add-btn,
+html[data-theme="dark"] .new-order button[type="submit"],
+html[data-theme="dark"] .customer-modal-btn-save,
+html[data-theme="dark"] .product-modal-btn-save,
+html[data-theme="dark"] .customers-pagination-btn,
+html[data-theme="dark"] .orders-pagination-btn {
+  background: var(--accent, #8b6ff0) !important;
+  color: var(--text-on-accent, #100c1f) !important;
+}
+
+html[data-theme="dark"] .customer-add-btn:hover,
+html[data-theme="dark"] .product-add-btn:hover,
+html[data-theme="dark"] .message-add-btn:hover,
+html[data-theme="dark"] .orders-add-btn:hover,
+html[data-theme="dark"] .customer-modal-btn-save:hover,
+html[data-theme="dark"] .product-modal-btn-save:hover,
+html[data-theme="dark"] .customers-pagination-btn:hover:not(:disabled),
+html[data-theme="dark"] .orders-pagination-btn:hover:not(:disabled) {
+  background: var(--accent-hover, #9c85f5) !important;
+}
+
+html[data-theme="dark"] .oa-toast {
+  background: var(--bg-modal, #1e1836) !important;
+  border-color: var(--border-strong, #3a3260) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .oa-toast__content strong,
+html[data-theme="dark"] .oa-toast__content span {
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+/* =========================
+   Stage 4 — unified dark UI fixes
+   - full dark coverage for dashboard controls, tables, modals
+   - no bright disabled pagination buttons
+   - status badges use the approved dark palette
+========================= */
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] #root {
+  background: var(--bg-base, #100c1f) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .main-layout,
+html[data-theme="dark"] .main-layout__content {
+  background: var(--bg-base, #100c1f) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .dashboard-page,
+html[data-theme="dark"] .orders-page,
+html[data-theme="dark"] .products-page,
+html[data-theme="dark"] .customers-page,
+html[data-theme="dark"] .messages-page,
+html[data-theme="dark"] .users-page,
+html[data-theme="dark"] .settings-page,
+html[data-theme="dark"] .new-order,
+html[data-theme="dark"] .new-order-page,
+html[data-theme="dark"] .msg-form-overlay {
+  background: var(--bg-base, #100c1f) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .dashboard-card,
+html[data-theme="dark"] .orders-table-wrap,
+html[data-theme="dark"] .products-table-wrap,
+html[data-theme="dark"] .customers-table-wrap,
+html[data-theme="dark"] .messages-table-wrap,
+html[data-theme="dark"] .users-list,
+html[data-theme="dark"] .user-card,
+html[data-theme="dark"] .orders-pagination,
+html[data-theme="dark"] .products-pagination,
+html[data-theme="dark"] .customers-pagination,
+html[data-theme="dark"] .messages-pagination,
+html[data-theme="dark"] .settings-content,
+html[data-theme="dark"] .settings-content > section,
+html[data-theme="dark"] .settings-content > div,
+html[data-theme="dark"] .display-settings__card,
+html[data-theme="dark"] .currency-settings__card,
+html[data-theme="dark"] .security-settings__card,
+html[data-theme="dark"] .backup-card,
+html[data-theme="dark"] .date-settings-card,
+html[data-theme="dark"] .invoice-settings__options,
+html[data-theme="dark"] .invoice-settings__preview,
+html[data-theme="dark"] .product-modal-box,
+html[data-theme="dark"] .customer-modal-box,
+html[data-theme="dark"] .message-modal-box,
+html[data-theme="dark"] .order-modal-box,
+html[data-theme="dark"] .user-modal-box,
+html[data-theme="dark"] .msg-items-modal,
+html[data-theme="dark"] .msg-form,
+html[data-theme="dark"] .new-order-card,
+html[data-theme="dark"] .new-order-panel,
+html[data-theme="dark"] .order-form-card {
+  background: var(--bg-surface, #1a1530) !important;
+  border-color: var(--border, #2a2447) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .orders-table th,
+html[data-theme="dark"] .orders-table td,
+html[data-theme="dark"] .products-table th,
+html[data-theme="dark"] .products-table td,
+html[data-theme="dark"] .customers-table th,
+html[data-theme="dark"] .customers-table td,
+html[data-theme="dark"] .messages-table th,
+html[data-theme="dark"] .messages-table td,
+html[data-theme="dark"] .mt-head,
+html[data-theme="dark"] .mt-cell,
+html[data-theme="dark"] .pt-cell,
+html[data-theme="dark"] .customers-td,
+html[data-theme="dark"] .orders-td,
+html[data-theme="dark"] .users-td,
+html[data-theme="dark"] .products-th,
+html[data-theme="dark"] .customers-th,
+html[data-theme="dark"] .messages-th,
+html[data-theme="dark"] .orders-th,
+html[data-theme="dark"] .users-th {
+  background: var(--bg-surface, #1a1530) !important;
+  border-color: var(--border, #2a2447) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .orders-row:hover,
+html[data-theme="dark"] .pt-row:hover,
+html[data-theme="dark"] .customers-row:hover,
+html[data-theme="dark"] .mt-row:hover,
+html[data-theme="dark"] .users-row:hover,
+html[data-theme="dark"] .user-card:hover {
+  background: var(--bg-surface-2, #241d40) !important;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .orders-search,
+html[data-theme="dark"] .products-search,
+html[data-theme="dark"] .customers-search,
+html[data-theme="dark"] .messages-search,
+html[data-theme="dark"] .users-search,
+html[data-theme="dark"] .search-input,
+html[data-theme="dark"] .product-modal-input,
+html[data-theme="dark"] .customer-modal-input,
+html[data-theme="dark"] .msg-input,
+html[data-theme="dark"] .msg-select,
+html[data-theme="dark"] .msg-textarea,
+html[data-theme="dark"] .security-field input,
+html[data-theme="dark"] .password-input-wrap input,
+html[data-theme="dark"] .currency-select,
+html[data-theme="dark"] .setting-number-input,
+html[data-theme="dark"] .date-settings-manual-field input,
+html[data-theme="dark"] .date-settings-format-row select {
+  background: var(--bg-surface-2, #241d40) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  border-color: var(--border-strong, #3a3260) !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder,
+html[data-theme="dark"] .search-input::placeholder {
+  color: var(--text-muted, #6e6690) !important;
+}
+
+html[data-theme="dark"] .orders-title,
+html[data-theme="dark"] .products-title,
+html[data-theme="dark"] .customers-title,
+html[data-theme="dark"] .messages-title,
+html[data-theme="dark"] .users-title,
+html[data-theme="dark"] .dashboard-title,
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] label,
+html[data-theme="dark"] .settings-content h1,
+html[data-theme="dark"] .settings-content h2,
+html[data-theme="dark"] .settings-content h3 {
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .orders-pagination-btn,
+html[data-theme="dark"] .products-pagination-btn,
+html[data-theme="dark"] .customers-pagination-btn,
+html[data-theme="dark"] .pagination-btn,
+html[data-theme="dark"] .customers-pagination button,
+html[data-theme="dark"] .messages-pagination button,
+html[data-theme="dark"] .orders-pagination button,
+html[data-theme="dark"] .products-pagination button {
+  background: var(--accent, #8b6ff0) !important;
+  color: var(--text-on-accent, #100c1f) !important;
+  border-color: var(--accent, #8b6ff0) !important;
+}
+
+html[data-theme="dark"] .orders-pagination-btn:disabled,
+html[data-theme="dark"] .products-pagination-btn:disabled,
+html[data-theme="dark"] .customers-pagination-btn:disabled,
+html[data-theme="dark"] .pagination-btn:disabled,
+html[data-theme="dark"] .customers-pagination button:disabled,
+html[data-theme="dark"] .messages-pagination button:disabled,
+html[data-theme="dark"] .orders-pagination button:disabled,
+html[data-theme="dark"] .products-pagination button:disabled {
+  background: var(--bg-surface-2, #241d40) !important;
+  color: var(--text-muted, #6e6690) !important;
+  border-color: var(--border, #2a2447) !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
+
+html[data-theme="dark"] .customer-add-btn,
+html[data-theme="dark"] .product-add-btn,
+html[data-theme="dark"] .message-add-btn,
+html[data-theme="dark"] .orders-add-btn,
+html[data-theme="dark"] .add-btn,
+html[data-theme="dark"] .customer-modal-btn-save,
+html[data-theme="dark"] .product-modal-btn-save,
+html[data-theme="dark"] .msg-submit,
+html[data-theme="dark"] .new-order-action-primary {
+  background: var(--accent, #8b6ff0) !important;
+  color: var(--text-on-accent, #100c1f) !important;
+  border-color: var(--accent, #8b6ff0) !important;
+}
+
+html[data-theme="dark"] .customer-add-btn:hover,
+html[data-theme="dark"] .product-add-btn:hover,
+html[data-theme="dark"] .message-add-btn:hover,
+html[data-theme="dark"] .orders-add-btn:hover,
+html[data-theme="dark"] .add-btn:hover {
+  background: var(--accent-hover, #9c85f5) !important;
+}
+
+html[data-theme="dark"] .status-badge.paid,
+html[data-theme="dark"] .customer-badge.active,
+html[data-theme="dark"] .product-status-badge.active,
+html[data-theme="dark"] .user-status-badge.active,
+html[data-theme="dark"] .msg-badge.sent,
+html[data-theme="dark"] .msg-badge.success {
+  background: var(--success-bg, #12301f) !important;
+  color: var(--success-text, #4ade80) !important;
+  border-color: rgba(74, 222, 128, 0.36) !important;
+}
+
+html[data-theme="dark"] .status-badge.pending,
+html[data-theme="dark"] .status-badge.registered,
+html[data-theme="dark"] .status-badge.draft,
+html[data-theme="dark"] .msg-badge.draft,
+html[data-theme="dark"] .msg-badge.pending {
+  background: var(--warning-bg, #2e2410) !important;
+  color: var(--warning-text, #fbbf24) !important;
+  border-color: rgba(251, 191, 36, 0.36) !important;
+}
+
+html[data-theme="dark"] .status-badge.cancelled,
+html[data-theme="dark"] .status-badge.canceled,
+html[data-theme="dark"] .status-badge.failed,
+html[data-theme="dark"] .customer-badge.inactive,
+html[data-theme="dark"] .product-status-badge.inactive,
+html[data-theme="dark"] .user-status-badge.inactive,
+html[data-theme="dark"] .msg-badge.failed {
+  background: var(--danger-bg, #2e1416) !important;
+  color: var(--danger-text, #f87171) !important;
+  border-color: rgba(248, 113, 113, 0.36) !important;
+}
+
+/* =========================================================
+   Stage 5 — final dark-mode cleanup and consistency fixes
+   ========================================================= */
+
+/* 1) Dashboard chart cleanup */
+html[data-theme="dark"] .dashboard-page .recharts-cartesian-grid line,
+html[data-theme="dark"] .dashboard-page .recharts-cartesian-grid-horizontal line,
+html[data-theme="dark"] .dashboard-page .recharts-cartesian-grid-vertical line,
+html[data-theme="dark"] .dashboard-page .recharts-reference-line line {
+  stroke: transparent !important;
+}
+
+html[data-theme="dark"] .dashboard-page .recharts-cartesian-axis-line,
+html[data-theme="dark"] .dashboard-page .recharts-xAxis .recharts-cartesian-axis-line,
+html[data-theme="dark"] .dashboard-page .recharts-yAxis .recharts-cartesian-axis-line {
+  stroke: rgba(107, 114, 128, 0.28) !important;
+}
+
+html[data-theme="dark"] .dashboard-page .order-status-pie .recharts-sector,
+html[data-theme="dark"] .dashboard-page .order-status-pie .recharts-pie-sector,
+html[data-theme="dark"] .dashboard-page .order-status-pie path {
+  stroke: transparent !important;
+  stroke-width: 0 !important;
+  outline: none !important;
+}
+
+html[data-theme="dark"] .dashboard-page .recharts-active-dot circle,
+html[data-theme="dark"] .dashboard-page .recharts-dot circle {
+  stroke: transparent !important;
+}
+
+/* 2) Uniform save / primary / secondary buttons in all edit-add modals */
+html[data-theme="dark"] .modal-btn-save,
+html[data-theme="dark"] .customer-modal-btn-save,
+html[data-theme="dark"] .product-modal-btn-save,
+html[data-theme="dark"] .modal-btn-change-pass,
+html[data-theme="dark"] .msg-btn--send,
+html[data-theme="dark"] .msg-btn--save,
+html[data-theme="dark"] .msg-back-btn,
+html[data-theme="dark"] .pagination-btn:not(:disabled),
+html[data-theme="dark"] .pagination-button--primary:not(:disabled),
+html[data-theme="dark"] .add-btn,
+html[data-theme="dark"] .dashboard-page .outline-action-btn,
+html[data-theme="dark"] .dashboard-page .notification-action-btn {
+  border-color: rgba(129, 140, 248, 0.28) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .modal-btn-save,
+html[data-theme="dark"] .customer-modal-btn-save,
+html[data-theme="dark"] .product-modal-btn-save,
+html[data-theme="dark"] .modal-btn-change-pass,
+html[data-theme="dark"] .msg-btn--send,
+html[data-theme="dark"] .add-btn,
+html[data-theme="dark"] .pagination-btn:not(:disabled),
+html[data-theme="dark"] .pagination-button--primary:not(:disabled) {
+  background: var(--accent, #8b5cf6) !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .msg-btn--save,
+html[data-theme="dark"] .msg-back-btn,
+html[data-theme="dark"] .dashboard-page .outline-action-btn,
+html[data-theme="dark"] .dashboard-page .notification-action-btn {
+  background: rgba(139, 92, 246, 0.16) !important;
+  color: #c4b5fd !important;
+  border: 1px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+html[data-theme="dark"] .msg-btn--cancel,
+html[data-theme="dark"] .pagination-btn:disabled,
+html[data-theme="dark"] .pagination-button:disabled {
+  background: #2c2544 !important;
+  color: #8f87b3 !important;
+  border: 1px solid var(--border-color, #3d3d3d) !important;
+}
+
+html[data-theme="dark"] .modal-btn-delete,
+html[data-theme="dark"] .customer-modal-btn-delete,
+html[data-theme="dark"] .product-modal-btn-delete {
+  background: rgba(220, 38, 38, 0.88) !important;
+  color: #ffffff !important;
+}
+
+/* 3) All badges in all pages — unified dark mode */
+html[data-theme="dark"] .product-badge,
+html[data-theme="dark"] .customer-badge,
+html[data-theme="dark"] .user-badge,
+html[data-theme="dark"] .order-status-badge,
+html[data-theme="dark"] .msg-badge,
+html[data-theme="dark"] .status-badge,
+html[data-theme="dark"] .recent-order-status,
+html[data-theme="dark"] .recent-order-status-badge {
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] .product-badge.active,
+html[data-theme="dark"] .customer-badge.active,
+html[data-theme="dark"] .user-badge.active,
+html[data-theme="dark"] .msg-badge--sent,
+html[data-theme="dark"] .order-status-badge--paid,
+html[data-theme="dark"] .recent-order-status.paid,
+html[data-theme="dark"] .recent-order-status-badge.paid,
+html[data-theme="dark"] .status-badge.paid,
+html[data-theme="dark"] .status-badge.active {
+  background: rgba(34, 197, 94, 0.16) !important;
+  color: #86efac !important;
+  border-color: rgba(134, 239, 172, 0.28) !important;
+}
+
+html[data-theme="dark"] .product-badge.inactive,
+html[data-theme="dark"] .customer-badge.inactive,
+html[data-theme="dark"] .user-badge.inactive,
+html[data-theme="dark"] .msg-badge--failed,
+html[data-theme="dark"] .order-status-badge--cancelled,
+html[data-theme="dark"] .recent-order-status.cancelled,
+html[data-theme="dark"] .recent-order-status-badge.cancelled,
+html[data-theme="dark"] .status-badge.cancelled,
+html[data-theme="dark"] .status-badge.inactive {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(252, 165, 165, 0.28) !important;
+}
+
+html[data-theme="dark"] .msg-badge--draft,
+html[data-theme="dark"] .order-status-badge--registered,
+html[data-theme="dark"] .recent-order-status.registered,
+html[data-theme="dark"] .recent-order-status-badge.registered,
+html[data-theme="dark"] .status-badge.registered {
+  background: rgba(139, 92, 246, 0.16) !important;
+  color: #c4b5fd !important;
+  border-color: rgba(196, 181, 253, 0.26) !important;
+}
+
+html[data-theme="dark"] .order-status-badge--pending,
+html[data-theme="dark"] .recent-order-status.pending,
+html[data-theme="dark"] .recent-order-status-badge.pending,
+html[data-theme="dark"] .status-badge.pending {
+  background: rgba(245, 158, 11, 0.16) !important;
+  color: #fdba74 !important;
+  border-color: rgba(253, 186, 116, 0.26) !important;
+}
+
+html[data-theme="dark"] .modal-status-btn,
+html[data-theme="dark"] .customer-modal-status-btn,
+html[data-theme="dark"] .product-modal-status-btn {
+  background: var(--input-bg, #2d2548) !important;
+  color: var(--text-soft, #9f97bf) !important;
+}
+
+html[data-theme="dark"] .modal-status-btn.selected-active,
+html[data-theme="dark"] .customer-modal-status-btn.selected-active,
+html[data-theme="dark"] .product-modal-status-btn.selected-active {
+  background: rgba(34, 197, 94, 0.16) !important;
+  color: #86efac !important;
+}
+
+html[data-theme="dark"] .modal-status-btn.selected-inactive,
+html[data-theme="dark"] .customer-modal-status-btn.selected-inactive,
+html[data-theme="dark"] .product-modal-status-btn.selected-inactive {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #fca5a5 !important;
+}
+
+/* 4) Table / filter / input consistency */
+html[data-theme="dark"] .rows-per-page select,
+html[data-theme="dark"] .search-input,
+html[data-theme="dark"] .products-search,
+html[data-theme="dark"] .customers-search,
+html[data-theme="dark"] .users-search,
+html[data-theme="dark"] .orders-search,
+html[data-theme="dark"] .messages-search {
+  background: var(--input-bg, #2d2548) !important;
+  border-color: var(--border-color, #3d3d3d) !important;
+  color: var(--input-text, #ffffff) !important;
+}
+
+html[data-theme="dark"] .search-input::placeholder {
+  color: #8f87b3 !important;
+}
+
+/* 5) Settings sidebar icons vertically centered */
+html[data-theme="dark"] .settings-sidebar__item,
+html[data-theme="dark"] .settings-sidebar__item-label {
+  display: flex !important;
+  align-items: center !important;
+}
+
+html[data-theme="dark"] .settings-sidebar__item {
+  justify-content: space-between !important;
+}
+
+html[data-theme="dark"] .settings-sidebar__item svg,
+html[data-theme="dark"] .settings-sidebar__item .settings-sidebar__arrow {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+}
+
+/* 6) Important exception: invoice preview should stay white/light */
+.invoice-preview,
+.invoice-preview-paper,
+.invoice-preview-shell,
+.invoice-canvas,
+.print-preview,
+.invoice-sheet {
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+/* =========================================================
+   Stage 6 — user-requested dark-mode + settings refinements
+   ========================================================= */
+
+/* 1) Sharper / more energetic badges across the app */
+html[data-theme="dark"] .product-badge.active,
+html[data-theme="dark"] .customer-badge.active,
+html[data-theme="dark"] .user-badge.active,
+html[data-theme="dark"] .msg-badge--sent,
+html[data-theme="dark"] .msg-badge.sent,
+html[data-theme="dark"] .order-status-badge--paid,
+html[data-theme="dark"] .recent-order-status.paid,
+html[data-theme="dark"] .recent-order-status-badge.paid,
+html[data-theme="dark"] .status-badge.paid,
+html[data-theme="dark"] .status-badge.active {
+  background: rgba(34, 197, 94, 0.24) !important;
+  color: #72ffad !important;
+  border-color: rgba(114, 255, 173, 0.42) !important;
+}
+
+html[data-theme="dark"] .product-badge.inactive,
+html[data-theme="dark"] .customer-badge.inactive,
+html[data-theme="dark"] .user-badge.inactive,
+html[data-theme="dark"] .msg-badge--failed,
+html[data-theme="dark"] .msg-badge.failed,
+html[data-theme="dark"] .order-status-badge--cancelled,
+html[data-theme="dark"] .recent-order-status.cancelled,
+html[data-theme="dark"] .recent-order-status-badge.cancelled,
+html[data-theme="dark"] .status-badge.cancelled,
+html[data-theme="dark"] .status-badge.canceled,
+html[data-theme="dark"] .status-badge.failed,
+html[data-theme="dark"] .status-badge.inactive {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #ff9e9e !important;
+  border-color: rgba(255, 158, 158, 0.4) !important;
+}
+
+html[data-theme="dark"] .msg-badge--draft,
+html[data-theme="dark"] .msg-badge.draft,
+html[data-theme="dark"] .order-status-badge--registered,
+html[data-theme="dark"] .recent-order-status.registered,
+html[data-theme="dark"] .recent-order-status-badge.registered,
+html[data-theme="dark"] .status-badge.registered {
+  background: rgba(139, 92, 246, 0.24) !important;
+  color: #d6bcff !important;
+  border-color: rgba(214, 188, 255, 0.4) !important;
+}
+
+html[data-theme="dark"] .order-status-badge--pending,
+html[data-theme="dark"] .recent-order-status.pending,
+html[data-theme="dark"] .recent-order-status-badge.pending,
+html[data-theme="dark"] .status-badge.pending,
+html[data-theme="dark"] .msg-badge.pending {
+  background: rgba(245, 158, 11, 0.22) !important;
+  color: #ffc875 !important;
+  border-color: rgba(255, 200, 117, 0.38) !important;
+}
+
+/* 2) Orders search box radius consistency */
+html[data-theme="dark"] .orders-search {
+  border-radius: 12px !important;
+}
+
+html[data-theme="dark"] .orders-search input {
+  border-radius: 12px !important;
+}
+
+/* 3) Order items popup should be fully dark */
+html[data-theme="dark"] .orders-items-popup,
+html[data-theme="dark"] .orders-items-popup__header,
+html[data-theme="dark"] .orders-items-popup__body,
+html[data-theme="dark"] .orders-popup-item {
+  background: var(--bg-surface, #1a1530) !important;
+  border-color: var(--border, #2a2447) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .orders-items-popup__header h3,
+html[data-theme="dark"] .orders-popup-item__content strong,
+html[data-theme="dark"] .orders-popup-item__price strong {
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .orders-items-popup__header p,
+html[data-theme="dark"] .orders-popup-item__content span,
+html[data-theme="dark"] .orders-popup-item__price span,
+html[data-theme="dark"] .orders-items-popup__empty {
+  color: #a79ec7 !important;
+}
+
+html[data-theme="dark"] .orders-items-popup__close {
+  background: rgba(139, 92, 246, 0.18) !important;
+  color: #cdb8ff !important;
+}
+
+html[data-theme="dark"] .orders-popup-item__number {
+  background: rgba(139, 92, 246, 0.2) !important;
+  color: #d2beff !important;
+}
+
+/* 4) Confirm delete dialog buttons + container in dark mode */
+html[data-theme="dark"] .confirm-box {
+  background: var(--bg-modal, #1e1836) !important;
+  border: 1px solid var(--border-strong, #3a3260) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .confirm-text,
+html[data-theme="dark"] .confirm-text strong {
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .confirm-icon {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #ff8f8f !important;
+}
+
+html[data-theme="dark"] .confirm-btn {
+  border: 1px solid transparent !important;
+}
+
+html[data-theme="dark"] .confirm-btn--yes {
+  background: rgba(220, 38, 38, 0.9) !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .confirm-btn--no {
+  background: var(--bg-surface-2, #241d40) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  border-color: var(--border-strong, #3a3260) !important;
+}
+
+html[data-theme="dark"] .confirm-btn--no:hover {
+  background: rgba(139, 92, 246, 0.16) !important;
+}
+
+/* 5) Users page dots menu hover state should not turn white */
+html[data-theme="dark"] .dots-btn:hover {
+  background: rgba(139, 92, 246, 0.16) !important;
+  color: #d4c1ff !important;
+}
+
+html[data-theme="dark"] .dots-item:hover {
+  background: rgba(139, 92, 246, 0.16) !important;
+  color: #efe9ff !important;
+}
+
+/* 6) Change password buttons and security modal buttons in dark mode */
+html[data-theme="dark"] .change-password-btn,
+html[data-theme="dark"] .modal-btn-change-pass,
+html[data-theme="dark"] .security-modal__btn--save {
+  background: var(--accent, #8b6ff0) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(139, 111, 240, 0.4) !important;
+}
+
+html[data-theme="dark"] .change-password-btn:hover,
+html[data-theme="dark"] .modal-btn-change-pass:hover,
+html[data-theme="dark"] .security-modal__btn--save:hover {
+  background: var(--accent-hover, #9c85f5) !important;
+}
+
+html[data-theme="dark"] .security-modal,
+html[data-theme="dark"] .security-modal__field input {
+  background: var(--bg-modal, #1e1836) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  border-color: var(--border-strong, #3a3260) !important;
+}
+
+html[data-theme="dark"] .security-modal__close,
+html[data-theme="dark"] .security-modal__field label {
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .security-modal__btn--cancel {
+  background: var(--bg-surface-2, #241d40) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  border: 1px solid var(--border-strong, #3a3260) !important;
+}
+
+/* 7) Settings date page: system today button must be dark */
+html[data-theme="dark"] .date-settings-actions-row button,
+html[data-theme="dark"] .date-settings-actions-row button:last-child {
+  background: var(--bg-surface-2, #241d40) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  border: 1px solid var(--border-strong, #3a3260) !important;
+}
+
+html[data-theme="dark"] .date-settings-actions-row button:first-child {
+  background: var(--accent, #8b6ff0) !important;
+  color: #ffffff !important;
+  border-color: rgba(139, 111, 240, 0.42) !important;
+}
+
+/* 8) Settings invoice preview exceptions — keep preview paper light and readable */
+html[data-theme="dark"] .invoice-settings__preview {
+  background: #131027 !important;
+}
+
+html[data-theme="dark"] .invoice-preview-title {
+  color: #f4f1ff !important;
+}
+
+html[data-theme="dark"] .invoice-preview-shell,
+html[data-theme="dark"] .invoice-preview-card {
+  background: transparent !important;
+}
+
+html[data-theme="dark"] .invoice-preview-paper,
+html[data-theme="dark"] .invoice-preview-paper * {
+  color-scheme: light !important;
+}
+
+html[data-theme="dark"] .invoice-preview-paper {
+  background: #ffffff !important;
+  color: var(--invoice-text, #111827) !important;
+  border-color: var(--invoice-border, #d7ddeb) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-header {
+  background: var(--invoice-primary, #163056) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-brand strong,
+html[data-theme="dark"] .invoice-preview-table th,
+html[data-theme="dark"] .invoice-preview-total {
+  color: var(--invoice-accent, #f7d657) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-brand span,
+html[data-theme="dark"] .invoice-preview-title-box p {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-contact,
+html[data-theme="dark"] .invoice-preview-buyer div,
+html[data-theme="dark"] .invoice-preview-note,
+html[data-theme="dark"] .invoice-preview-desc small,
+html[data-theme="dark"] .invoice-preview-signatures div,
+html[data-theme="dark"] .invoice-preview-footer {
+  color: var(--invoice-muted, #5a6476) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-buyer,
+html[data-theme="dark"] .invoice-preview-summary,
+html[data-theme="dark"] .invoice-preview-table,
+html[data-theme="dark"] .invoice-preview-table th,
+html[data-theme="dark"] .invoice-preview-table td,
+html[data-theme="dark"] .invoice-preview-contact,
+html[data-theme="dark"] .invoice-preview-signatures div,
+html[data-theme="dark"] .invoice-preview-footer,
+html[data-theme="dark"] .invoice-preview-summary div {
+  border-color: var(--invoice-border, #d7ddeb) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-buyer h4,
+html[data-theme="dark"] .invoice-preview-note strong {
+  color: var(--invoice-primary, #163056) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-table td,
+html[data-theme="dark"] .invoice-preview-desc strong,
+html[data-theme="dark"] .invoice-preview-summary div {
+  color: var(--invoice-text, #111827) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-contact {
+  background: var(--invoice-surface, #f6f9ff) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-table th {
+  background: var(--invoice-primary, #163056) !important;
+}
+
+html[data-theme="dark"] .invoice-preview-total {
+  background: var(--invoice-accent, #f7d657) !important;
+  color: var(--invoice-primary, #163056) !important;
+}
+
+/* =========================================================
+   Stage 7 — stronger final overrides
+   These selectors intentionally cover the exact classes currently used
+   across pages and override earlier injected styles.
+   ========================================================= */
+
+/* Very sharp/energetic badges */
+html[data-theme="dark"] body .product-badge.active,
+html[data-theme="dark"] body .customer-badge.active,
+html[data-theme="dark"] body .user-badge.active,
+html[data-theme="dark"] body .msg-badge--sent,
+html[data-theme="dark"] body .msg-badge.sent,
+html[data-theme="dark"] body .order-status-badge--paid,
+html[data-theme="dark"] body .status-badge.paid,
+html[data-theme="dark"] body .status-badge.active,
+html[data-theme="dark"] body .status-pill.paid,
+html[data-theme="dark"] body .status-pill.active {
+  background: #064e2d !important;
+  color: #5cff9d !important;
+  border-color: #22ff88 !important;
+  box-shadow: 0 0 0 1px rgba(34, 255, 136, 0.14), 0 0 18px rgba(34, 255, 136, 0.1) !important;
+}
+
+html[data-theme="dark"] body .product-badge.inactive,
+html[data-theme="dark"] body .customer-badge.inactive,
+html[data-theme="dark"] body .user-badge.inactive,
+html[data-theme="dark"] body .msg-badge--failed,
+html[data-theme="dark"] body .msg-badge.failed,
+html[data-theme="dark"] body .order-status-badge--cancelled,
+html[data-theme="dark"] body .order-status-badge--canceled,
+html[data-theme="dark"] body .status-badge.cancelled,
+html[data-theme="dark"] body .status-badge.canceled,
+html[data-theme="dark"] body .status-badge.failed,
+html[data-theme="dark"] body .status-badge.inactive,
+html[data-theme="dark"] body .status-pill.cancelled,
+html[data-theme="dark"] body .status-pill.canceled,
+html[data-theme="dark"] body .status-pill.inactive {
+  background: #5a1217 !important;
+  color: #ff8f8f !important;
+  border-color: #ff3838 !important;
+  box-shadow: 0 0 0 1px rgba(255, 56, 56, 0.14), 0 0 18px rgba(255, 56, 56, 0.1) !important;
+}
+
+html[data-theme="dark"] body .order-status-badge--pending,
+html[data-theme="dark"] body .status-badge.pending,
+html[data-theme="dark"] body .status-pill.pending,
+html[data-theme="dark"] body .msg-badge.pending {
+  background: #5b3800 !important;
+  color: #ffd166 !important;
+  border-color: #ffb020 !important;
+  box-shadow: 0 0 0 1px rgba(255, 176, 32, 0.14), 0 0 18px rgba(255, 176, 32, 0.1) !important;
+}
+
+html[data-theme="dark"] body .order-status-badge--registered,
+html[data-theme="dark"] body .status-badge.registered,
+html[data-theme="dark"] body .status-pill.registered,
+html[data-theme="dark"] body .msg-badge--draft,
+html[data-theme="dark"] body .msg-badge.draft {
+  background: #34206b !important;
+  color: #d9c7ff !important;
+  border-color: #9b7cff !important;
+  box-shadow: 0 0 0 1px rgba(155, 124, 255, 0.14), 0 0 18px rgba(155, 124, 255, 0.1) !important;
+}
+
+/* Orders search radius and item popup fallback */
+html[data-theme="dark"] body .orders-search,
+html[data-theme="dark"] body .orders-search input {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Custom confirm modals, including product/customer/user/message confirm boxes */
+html[data-theme="dark"] body .confirm-box,
+html[data-theme="dark"] body .confirm-modal,
+html[data-theme="dark"] body .delete-confirm-modal,
+html[data-theme="dark"] body .orders-confirm-modal,
+html[data-theme="dark"] body .msg-confirm-modal {
+  background: #1e1836 !important;
+  border: 1px solid #3a3260 !important;
+  color: #edeaf8 !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48) !important;
+}
+
+html[data-theme="dark"] body .confirm-text,
+html[data-theme="dark"] body .confirm-text strong,
+html[data-theme="dark"] body .orders-confirm-text,
+html[data-theme="dark"] body .orders-confirm-text strong,
+html[data-theme="dark"] body .msg-confirm-text,
+html[data-theme="dark"] body .msg-confirm-text strong {
+  color: #edeaf8 !important;
+}
+
+html[data-theme="dark"] body .confirm-icon,
+html[data-theme="dark"] body .orders-confirm-icon,
+html[data-theme="dark"] body .msg-confirm-icon {
+  background: rgba(239, 68, 68, 0.24) !important;
+  color: #ff8f8f !important;
+}
+
+html[data-theme="dark"] body .confirm-btn--yes,
+html[data-theme="dark"] body .confirm-btn--danger,
+html[data-theme="dark"] body .confirm-btn.danger,
+html[data-theme="dark"] body .orders-confirm-btn--danger,
+html[data-theme="dark"] body .msg-confirm-btn--danger {
+  background: #ef2424 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 143, 143, 0.24) !important;
+}
+
+html[data-theme="dark"] body .confirm-btn--no,
+html[data-theme="dark"] body .confirm-btn--cancel,
+html[data-theme="dark"] body .confirm-btn.cancel,
+html[data-theme="dark"] body .orders-confirm-btn--cancel,
+html[data-theme="dark"] body .msg-confirm-btn--cancel {
+  background: #241d40 !important;
+  color: #edeaf8 !important;
+  border: 1px solid #3a3260 !important;
+}
+
+/* Users three-dots menu: no white hover */
+html[data-theme="dark"] body .dots-menu,
+html[data-theme="dark"] body .user-menu,
+html[data-theme="dark"] body .row-actions__menu {
+  background: #1e1836 !important;
+  border-color: #3a3260 !important;
+  color: #edeaf8 !important;
+}
+
+html[data-theme="dark"] body .dots-item,
+html[data-theme="dark"] body .user-menu button,
+html[data-theme="dark"] body .row-actions__item {
+  color: #edeaf8 !important;
+}
+
+html[data-theme="dark"] body .dots-item:hover,
+html[data-theme="dark"] body .user-menu button:hover,
+html[data-theme="dark"] body .row-actions__item:hover {
+  background: rgba(139, 111, 240, 0.22) !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] body .dots-item.danger:hover,
+html[data-theme="dark"] body .row-actions__item--danger:hover {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #ff9e9e !important;
+}
+
+/* Settings sidebar: force icon-only regardless of current JSX version */
+.settings-page .settings-sidebar__title,
+.settings-page .settings-sidebar__item-label,
+.settings-page .settings-sidebar__arrow,
+.settings-page .settings-sidebar__item > span,
+.settings-page .settings-sidebar__item > strong,
+.settings-page .settings-sidebar__item > p {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.settings-page .settings-sidebar {
+  width: 92px !important;
+  min-width: 92px !important;
+  max-width: 92px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.settings-page .settings-sidebar__nav {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 13px !important;
+  padding: 28px 0 !important;
+}
+
+.settings-page .settings-sidebar__item {
+  width: 54px !important;
+  height: 54px !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  border-radius: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: 0 !important;
+}
+
+.settings-page .settings-sidebar__item svg,
+.settings-page .settings-sidebar__icon {
+  width: 23px !important;
+  height: 23px !important;
+  margin: 0 !important;
+  display: block !important;
+  flex: 0 0 auto !important;
+  align-self: center !important;
+}
+
+/* =========================================================
+   Stage 8 — final data restore + hard dark-mode overrides
+   ========================================================= */
+
+/* Sharp, energetic badges with exact page class names */
+html[data-theme="dark"] .order-status-badge--paid,
+html[data-theme="dark"] .status-badge.paid,
+html[data-theme="dark"] .msg-badge--sent,
+html[data-theme="dark"] .product-badge.active,
+html[data-theme="dark"] .customer-badge.active,
+html[data-theme="dark"] .user-badge.active,
+html[data-theme="dark"] .modal-status-btn.selected-active,
+html[data-theme="dark"] .customer-modal-status-btn.selected-active,
+html[data-theme="dark"] .product-modal-status-btn.selected-active {
+  background: rgba(0, 245, 130, 0.22) !important;
+  color: #4dff9d !important;
+  border: 2px solid rgba(77, 255, 157, 0.78) !important;
+  box-shadow: 0 0 0 1px rgba(77, 255, 157, 0.08), 0 0 14px rgba(0, 245, 130, 0.16) !important;
+}
+
+html[data-theme="dark"] .order-status-badge--pending,
+html[data-theme="dark"] .status-badge.pending,
+html[data-theme="dark"] .msg-badge--draft {
+  background: rgba(255, 170, 0, 0.24) !important;
+  color: #ffc34d !important;
+  border: 2px solid rgba(255, 195, 77, 0.78) !important;
+  box-shadow: 0 0 0 1px rgba(255, 195, 77, 0.08), 0 0 14px rgba(255, 170, 0, 0.16) !important;
+}
+
+html[data-theme="dark"] .order-status-badge--cancelled,
+html[data-theme="dark"] .status-badge.cancelled,
+html[data-theme="dark"] .status-badge.canceled,
+html[data-theme="dark"] .msg-badge--failed,
+html[data-theme="dark"] .product-badge.inactive,
+html[data-theme="dark"] .customer-badge.inactive,
+html[data-theme="dark"] .user-badge.inactive,
+html[data-theme="dark"] .modal-status-btn.selected-inactive,
+html[data-theme="dark"] .customer-modal-status-btn.selected-inactive,
+html[data-theme="dark"] .product-modal-status-btn.selected-inactive {
+  background: rgba(255, 53, 80, 0.22) !important;
+  color: #ff6b7f !important;
+  border: 2px solid rgba(255, 107, 127, 0.78) !important;
+  box-shadow: 0 0 0 1px rgba(255, 107, 127, 0.08), 0 0 14px rgba(255, 53, 80, 0.16) !important;
+}
+
+html[data-theme="dark"] .order-status-badge--registered,
+html[data-theme="dark"] .status-badge.registered {
+  background: rgba(139, 92, 246, 0.26) !important;
+  color: #d5c3ff !important;
+  border: 2px solid rgba(213, 195, 255, 0.72) !important;
+  box-shadow: 0 0 0 1px rgba(213, 195, 255, 0.08), 0 0 14px rgba(139, 92, 246, 0.16) !important;
+}
+
+/* Orders search radius — exact current classes */
+.orders-search,
+.orders-search input,
+.orders-search .search-input {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+}
+
+html[data-theme="dark"] .orders-search,
+html[data-theme="dark"] .orders-search input,
+html[data-theme="dark"] .orders-search .search-input {
+  background: var(--bg-surface-2, #241d40) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  border-color: var(--border-strong, #3a3260) !important;
+}
+
+/* Orders items popup: fully dark */
+html[data-theme="dark"] .orders-popup-backdrop {
+  background: rgba(9, 6, 18, 0.58) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+html[data-theme="dark"] .orders-items-popup,
+html[data-theme="dark"] .orders-items-popup__header,
+html[data-theme="dark"] .orders-items-popup__body,
+html[data-theme="dark"] .orders-popup-item {
+  background: var(--bg-modal, #1e1836) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  border-color: var(--border-strong, #3a3260) !important;
+}
+
+html[data-theme="dark"] .orders-items-popup__header h3,
+html[data-theme="dark"] .orders-popup-item__content strong,
+html[data-theme="dark"] .orders-popup-item__price strong {
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .orders-items-popup__header p,
+html[data-theme="dark"] .orders-popup-item__content span,
+html[data-theme="dark"] .orders-popup-item__price span,
+html[data-theme="dark"] .orders-items-popup__empty {
+  color: var(--text-secondary, #9c93be) !important;
+}
+
+html[data-theme="dark"] .orders-items-popup__close,
+html[data-theme="dark"] .orders-popup-item__number {
+  background: rgba(139, 111, 240, 0.2) !important;
+  color: #d7cbff !important;
+}
+
+/* Delete confirm modals: products/customers/orders/messages */
+html[data-theme="dark"] .product-delete-confirm-layer,
+html[data-theme="dark"] .customer-delete-confirm-layer,
+html[data-theme="dark"] .orders-confirm-overlay,
+html[data-theme="dark"] .msg-delete-confirm-layer {
+  background: rgba(8, 5, 17, 0.58) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+html[data-theme="dark"] .product-delete-confirm-box,
+html[data-theme="dark"] .customer-delete-confirm-box,
+html[data-theme="dark"] .orders-confirm-modal,
+html[data-theme="dark"] .msg-delete-confirm-box {
+  background: var(--bg-modal, #1e1836) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  border: 1px solid var(--border-strong, #3a3260) !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42) !important;
+}
+
+html[data-theme="dark"] .product-delete-confirm-text,
+html[data-theme="dark"] .product-delete-confirm-text strong,
+html[data-theme="dark"] .customer-delete-confirm-text,
+html[data-theme="dark"] .customer-delete-confirm-text strong,
+html[data-theme="dark"] .orders-confirm-text,
+html[data-theme="dark"] .orders-confirm-text strong,
+html[data-theme="dark"] .msg-delete-confirm-text,
+html[data-theme="dark"] .msg-delete-confirm-text strong {
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+html[data-theme="dark"] .product-delete-confirm-icon,
+html[data-theme="dark"] .customer-delete-confirm-icon,
+html[data-theme="dark"] .orders-confirm-icon,
+html[data-theme="dark"] .msg-delete-confirm-icon {
+  background: rgba(255, 53, 80, 0.16) !important;
+  color: #ff6b7f !important;
+}
+
+html[data-theme="dark"] .product-delete-confirm-submit,
+html[data-theme="dark"] .customer-delete-confirm-submit,
+html[data-theme="dark"] .orders-confirm-btn--danger,
+html[data-theme="dark"] .msg-delete-confirm-submit {
+  background: #ef233c !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 107, 127, 0.4) !important;
+}
+
+html[data-theme="dark"] .product-delete-confirm-cancel,
+html[data-theme="dark"] .customer-delete-confirm-cancel,
+html[data-theme="dark"] .orders-confirm-btn--cancel,
+html[data-theme="dark"] .msg-delete-confirm-cancel {
+  background: var(--bg-surface-2, #241d40) !important;
+  color: var(--text-primary, #edeaf8) !important;
+  border: 1px solid var(--border-strong, #3a3260) !important;
+}
+
+/* Users dropdown hover must never become white */
+html[data-theme="dark"] .dots-menu,
+html[data-theme="dark"] .user-card__menu,
+html[data-theme="dark"] .user-actions-menu {
+  background: var(--bg-modal, #1e1836) !important;
+  border-color: var(--border-strong, #3a3260) !important;
+}
+
+html[data-theme="dark"] .dots-menu button:hover,
+html[data-theme="dark"] .dots-item:hover,
+html[data-theme="dark"] .user-card__menu button:hover,
+html[data-theme="dark"] .user-actions-menu button:hover {
+  background: rgba(139, 111, 240, 0.18) !important;
+  color: var(--text-primary, #edeaf8) !important;
+}
+
+/* Settings icon-only sidebar: hide any label text and center icon */
+.settings-sidebar__item,
+html[data-theme="dark"] .settings-sidebar__item {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: row !important;
+  gap: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  text-align: center !important;
+  overflow: hidden !important;
+}
+
+.settings-sidebar__item-label,
+.settings-sidebar__item span:not(.settings-sidebar__icon),
+.settings-sidebar__item .settings-sidebar__arrow {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.settings-sidebar__item svg,
+.settings-sidebar__icon,
+html[data-theme="dark"] .settings-sidebar__item svg,
+html[data-theme="dark"] .settings-sidebar__icon {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  display: block !important;
+  margin: auto !important;
+  flex: 0 0 auto !important;
+  align-self: center !important;
+  transform: none !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+}

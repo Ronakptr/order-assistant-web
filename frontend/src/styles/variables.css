@@ -1,0 +1,143 @@
+:root {
+  --color-primary: #250299;
+  --color-primary-hover: #3510b8;
+  --color-primary-soft: #f0ecff;
+  --color-secondary-dark: #061152;
+
+  --app-bg: #f5f6ff;
+  --page-bg: #f5f6ff;
+  --card-bg: #ffffff;
+  --panel-bg: #ffffff;
+  --surface-bg: #ffffff;
+  --surface-soft: #fafbff;
+
+  --main-sidebar-bg: #e3e7ff;
+  --main-sidebar-text: #250299;
+  --main-sidebar-active-bg: #ffffff;
+
+  --settings-sidebar-bg: #250299;
+  --settings-sidebar-text: #ffffff;
+  --settings-sidebar-active-bg: rgba(255, 255, 255, 0.16);
+
+  --text-main: #111827;
+  --text-title: #111827;
+  --text-soft: #7b7fc4;
+  --text-muted: #9ca3af;
+  --text-inverse: #ffffff;
+
+  --border-color: #e4e7ff;
+  --border-strong: #d7dbef;
+
+  --input-bg: #ffffff;
+  --input-text: #111827;
+  --input-placeholder: #a8add8;
+
+  --success: #22c55e;
+  --success-text: #15803d;
+  --success-bg: #dcfce7;
+
+  --warning: #f59e0b;
+  --warning-text: #b45309;
+  --warning-bg: #fef3c7;
+
+  --danger: #ef4444;
+  --danger-text: #dc2626;
+  --danger-bg: #fee2e2;
+
+  --info: #2563eb;
+  --info-text: #1d4ed8;
+  --info-bg: #dbeafe;
+
+  --shadow-soft: 0 2px 10px rgba(17, 24, 39, 0.08);
+  --shadow-card: 0 8px 24px rgba(17, 24, 39, 0.08);
+  --shadow-popover: 0 24px 70px rgba(20, 20, 60, 0.18);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+
+  --sidebar-width: 282px;
+  --mobile-header-height: 56px;
+}
+
+html[data-theme="dark"] {
+  /* Order Assistant dark palette based on brand indigo #5B2FE0 */
+  --bg-base: #100c1f;
+  --bg-sidebar: #1a1530;
+  --bg-surface: #1a1530;
+  --bg-surface-2: #241d40;
+  --bg-modal: #1e1836;
+
+  --text-primary: #edeaf8;
+  --text-secondary: #9c93be;
+  --muted-dark: #6e6690;
+  --text-on-accent: #100c1f;
+
+  --accent: #8b6ff0;
+  --accent-hover: #9c85f5;
+  --accent-pressed: #7259d6;
+
+  --border: #2a2447;
+  --border-strong: #3a3260;
+
+  --success-text: #72ffad;
+  --success-bg: #143523;
+  --warning-text: #ffc875;
+  --warning-bg: #36250a;
+  --danger-text: #ff9e9e;
+  --danger-bg: #381517;
+
+  --color-primary: var(--accent);
+  --color-primary-hover: var(--accent-hover);
+  --color-primary-soft: rgba(139, 111, 240, 0.16);
+  --color-secondary-dark: var(--accent-hover);
+
+  --app-bg: var(--bg-base);
+  --page-bg: var(--bg-base);
+  --card-bg: var(--bg-surface);
+  --panel-bg: var(--bg-surface);
+  --surface-bg: var(--bg-surface);
+  --surface-soft: var(--bg-surface-2);
+
+  --main-sidebar-bg: var(--bg-sidebar);
+  --main-sidebar-text: var(--text-primary);
+  --main-sidebar-active-bg: var(--bg-surface-2);
+
+  --settings-sidebar-bg: var(--bg-sidebar);
+  --settings-sidebar-text: var(--text-secondary);
+  --settings-sidebar-active-bg: var(--bg-surface-2);
+
+  --text-main: var(--text-primary);
+  --text-title: var(--text-primary);
+  --text-soft: var(--text-secondary);
+  --text-muted: var(--muted-dark);
+  --text-inverse: var(--text-on-accent);
+
+  --border-color: var(--border);
+  --input-bg: var(--bg-surface-2);
+  --input-text: var(--text-primary);
+  --input-placeholder: var(--text-muted);
+
+  --success: var(--success-text);
+  --warning: var(--warning-text);
+  --danger: var(--danger-text);
+  --info: var(--accent);
+  --info-text: #d2beff;
+  --info-bg: rgba(139, 111, 240, 0.22);
+
+  --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.24);
+  --shadow-card: 0 10px 26px rgba(0, 0, 0, 0.26);
+  --shadow-popover: 0 24px 70px rgba(0, 0, 0, 0.42);
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  background: var(--app-bg);
+  color: var(--text-main);
+}
