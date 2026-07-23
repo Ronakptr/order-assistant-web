@@ -1,4 +1,4 @@
-from sqlalchemy import inspect, text
+﻿from sqlalchemy import inspect, text
 
 from app.database import engine
 
@@ -28,7 +28,7 @@ def _create_company_settings_table_if_missing(table_names: set[str]) -> None:
                     setting_key VARCHAR(80) NOT NULL,
                     value_json TEXT NOT NULL DEFAULT '{}',
                     updated_by INTEGER,
-                    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 )
                 """
             )
@@ -63,23 +63,23 @@ def ensure_database_schema() -> None:
 
     if "users" in table_names:
         _add_column_if_missing("users", "email", "VARCHAR")
-        _add_column_if_missing("users", "updated_at", "DATETIME")
+        _add_column_if_missing("users", "updated_at", "TIMESTAMP")
         _add_column_if_missing("users", "company_id", "INTEGER")
 
         with engine.begin() as connection:
-            # هر کاربر قدیمی که company_id ندارد، به عنوان شرکت مستقل خودش در نظر گرفته می‌شود.
+            # Ù‡Ø± Ú©Ø§Ø±Ø¨Ø± Ù‚Ø¯ÛŒÙ…ÛŒ Ú©Ù‡ company_id Ù†Ø¯Ø§Ø±Ø¯ØŒ Ø¨Ù‡ Ø¹Ù†ÙˆØ§Ù† Ø´Ø±Ú©Øª Ù…Ø³ØªÙ‚Ù„ Ø®ÙˆØ¯Ø´ Ø¯Ø± Ù†Ø¸Ø± Ú¯Ø±ÙØªÙ‡ Ù…ÛŒâ€ŒØ´ÙˆØ¯.
             connection.execute(text("UPDATE users SET company_id = id WHERE company_id IS NULL"))
 
     if "customers" in table_names:
-        _add_column_if_missing("customers", "updated_at", "DATETIME")
+        _add_column_if_missing("customers", "updated_at", "TIMESTAMP")
         _add_column_if_missing("customers", "owner_id", "INTEGER")
         _add_column_if_missing("customers", "accounting_software", "VARCHAR")
         _add_column_if_missing("customers", "accounting_id", "VARCHAR")
-        # ستون قدیمی برای سازگاری با نسخه‌های قبلی، اگر وجود داشته باشد نگه داشته می‌شود.
+        # Ø³ØªÙˆÙ† Ù‚Ø¯ÛŒÙ…ÛŒ Ø¨Ø±Ø§ÛŒ Ø³Ø§Ø²Ú¯Ø§Ø±ÛŒ Ø¨Ø§ Ù†Ø³Ø®Ù‡â€ŒÙ‡Ø§ÛŒ Ù‚Ø¨Ù„ÛŒØŒ Ø§Ú¯Ø± ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø´ØªÙ‡ Ø¨Ø§Ø´Ø¯ Ù†Ú¯Ù‡ Ø¯Ø§Ø´ØªÙ‡ Ù…ÛŒâ€ŒØ´ÙˆØ¯.
         _add_column_if_missing("customers", "accounting_provider", "VARCHAR")
 
     if "products" in table_names:
-        _add_column_if_missing("products", "updated_at", "DATETIME")
+        _add_column_if_missing("products", "updated_at", "TIMESTAMP")
         _add_column_if_missing("products", "owner_id", "INTEGER")
         _add_column_if_missing("products", "accounting_software", "VARCHAR")
         _add_column_if_missing("products", "accounting_id", "VARCHAR")
@@ -89,9 +89,9 @@ def ensure_database_schema() -> None:
         _add_column_if_missing("orders", "owner_id", "INTEGER")
         _add_column_if_missing("orders", "accounting_software", "VARCHAR")
         _add_column_if_missing("orders", "accounting_id", "VARCHAR")
-        _add_column_if_missing("orders", "accounting_exported_at", "DATETIME")
+        _add_column_if_missing("orders", "accounting_exported_at", "TIMESTAMP")
         _add_column_if_missing("orders", "accounting_export_batch", "VARCHAR")
-        _add_column_if_missing("orders", "accounting_imported_at", "DATETIME")
+        _add_column_if_missing("orders", "accounting_imported_at", "TIMESTAMP")
         _add_column_if_missing("orders", "accounting_provider", "VARCHAR")
 
     if "messages" in table_names:
@@ -110,3 +110,4 @@ def ensure_database_schema() -> None:
                             text(f"UPDATE {table_name} SET owner_id = :owner_id WHERE owner_id IS NULL"),
                             {"owner_id": first_user_id},
                         )
+
