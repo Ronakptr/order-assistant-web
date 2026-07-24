@@ -1,135 +1,176 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '../../context/ThemeContext';
-import '../Login/Login.css';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../../api/auth";
+import "../Login/Login.css";
 
-function Register() {
-  const { t } = useTranslation();
-  const { theme } = useTheme();
+export default function Register() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    confirmPassword: '',
-    email: '',
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
-  };
+  function handleChange(event) {
+    const { name, value } = event.target;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setError("");
+    setNotice("");
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const fullName = formData.fullName.trim();
+    const username = formData.username.trim();
+    const email = formData.email.trim();
+
+    if (fullName.length < 2) {
+      setError("نام مدیر یا شرکت را وارد کنید.");
+      return;
+    }
+
+    if (username.length < 3) {
+      setError("نام کاربری باید حداقل ۳ کاراکتر باشد.");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("رمز عبور باید حداقل ۶ کاراکتر باشد.");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("رمز عبور و تکرار آن یکسان نیستند.");
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      if (formData.password !== formData.confirmPassword) {
-        setError(t('auth.password_mismatch'));
-      } else {
-        navigate('/login');
-      }
+
+    try {
+      await registerUser({
+        fullName,
+        username,
+        email,
+        password: formData.password,
+      });
+
+      const successMessage = "ثبت‌نام انجام شد.";
+      setNotice(successMessage);
+
+      setTimeout(() => {
+        navigate("/login", {
+          state: {
+            username,
+            successMessage,
+          },
+        });
+      }, 550);
+    } catch (err) {
+      setError(err.message || "خطا در ثبت‌نام");
+    } finally {
       setLoading(false);
-    }, 800);
-  };
+    }
+  }
 
   return (
-    <div className="login-page">
-      <div className="login-left">
-        <img
-          src={theme === 'dark' ? '/login-dark.jpg' : '/login-light.jpg'}
-          alt="register"
-          className="login-illustration"
-        />
-      </div>
-
-      <div className="login-right">
-        <div className="login-form-wrapper">
-          <h1 className="login-title">{t('auth.register_title')}</h1>
-
-          <form onSubmit={handleSubmit} className="login-form">
-            <div className="form-group">
-              <label className="form-label">{t('auth.username')}</label>
-              <input
-                type="text"
-                name="username"
-                className="form-input"
-                placeholder={t('auth.username_placeholder')}
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">{t('auth.password')}</label>
-              <div className="input-wrapper">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  className="form-input"
-                  placeholder={t('auth.password_placeholder')}
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-                <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? '👁️' : '🙈'}
-                </button>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">{t('auth.confirm_password')}</label>
-              <div className="input-wrapper">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  className="form-input"
-                  placeholder={t('auth.confirm_password_placeholder')}
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
-                <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  {showConfirmPassword ? '👁️' : '🙈'}
-                </button>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">{t('auth.email')}</label>
-              <input
-                type="email"
-                name="email"
-                className="form-input"
-                placeholder={t('auth.email_placeholder')}
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {error && <p className="error-message">{error}</p>}
-
-            <button type="submit" className="login-btn" disabled={loading}>
-              {loading ? t('common.loading') : t('auth.register_btn')}
-            </button>
-          </form>
-
-          <div className="login-links">
-            <span className="link-text">{t('auth.have_account')}</span>
-            <Link to="/login" className="link-btn">{t('auth.login')}</Link>
-          </div>
+    <main className="auth-page auth-page--register" dir="rtl">
+      <section className="auth-card auth-card--register" aria-labelledby="register-title">
+        <div className="auth-header">
+          <span className="auth-kicker">ثبت‌نام</span>
+          <h1 id="register-title">ساخت حساب</h1>
         </div>
-      </div>
-    </div>
+
+        {notice ? <div className="auth-alert auth-alert--success">{notice}</div> : null}
+        {error ? <div className="auth-alert auth-alert--error">{error}</div> : null}
+
+        <form className="auth-form auth-form--register" onSubmit={handleSubmit}>
+          <label className="auth-field auth-field--full">
+            <span>نام مدیر یا شرکت</span>
+            <input
+              type="text"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              autoComplete="name"
+              disabled={loading}
+              placeholder="نام مدیر یا شرکت"
+            />
+          </label>
+
+          <label className="auth-field">
+            <span>نام کاربری</span>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              autoComplete="username"
+              disabled={loading}
+              placeholder="نام کاربری"
+            />
+          </label>
+
+          <label className="auth-field">
+            <span>ایمیل</span>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              autoComplete="email"
+              disabled={loading}
+              placeholder="ایمیل"
+            />
+          </label>
+
+          <label className="auth-field">
+            <span>رمز عبور</span>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              autoComplete="new-password"
+              disabled={loading}
+              placeholder="رمز عبور"
+            />
+          </label>
+
+          <label className="auth-field">
+            <span>تکرار رمز عبور</span>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              autoComplete="new-password"
+              disabled={loading}
+              placeholder="تکرار رمز عبور"
+            />
+          </label>
+
+          <button className="auth-submit auth-submit--full" type="submit" disabled={loading}>
+            {loading ? "در حال ساخت..." : "ثبت‌نام"}
+          </button>
+        </form>
+
+        <div className="auth-footer">
+          حساب دارید؟
+          <Link to="/login">وارد شوید</Link>
+        </div>
+      </section>
+    </main>
   );
 }
-
-export default Register;

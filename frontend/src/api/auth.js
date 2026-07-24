@@ -86,6 +86,11 @@ export function clearAuthSession() {
   dispatchAuthChanged();
 }
 
+async function readApiError(response, fallbackMessage) {
+  const error = await response.json().catch(() => null);
+  return error?.detail || fallbackMessage;
+}
+
 export async function loginUser(username, password) {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
@@ -99,8 +104,7 @@ export async function loginUser(username, password) {
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => null);
-    throw new Error(error?.detail || "خطا در ورود به حساب");
+    throw new Error(await readApiError(response, "خطا در ورود به حساب"));
   }
 
   const data = await response.json();
@@ -108,6 +112,69 @@ export async function loginUser(username, password) {
   saveAuthSession(data);
 
   return data;
+}
+
+export async function startLoginOtp(username, password) {
+  const response = await fetch(`${API_BASE_URL}/auth/login/start`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username,
+      password,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readApiError(response, "خطا در شروع ورود"));
+  }
+
+  return response.json();
+}
+
+export async function verifyLoginOtp(challengeId, otpCode) {
+  const response = await fetch(`${API_BASE_URL}/auth/login/verify-otp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      challenge_id: Number(challengeId),
+      otp_code: String(otpCode || "").trim(),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readApiError(response, "کد تایید اشتباه است"));
+  }
+
+  const data = await response.json();
+
+  saveAuthSession(data);
+
+  return data;
+}
+
+export async function registerUser({ username, password, email, fullName }) {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: String(username || "").trim(),
+      password: String(password || ""),
+      email: String(email || "").trim() || null,
+      full_name: String(fullName || username || "").trim() || null,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readApiError(response, "خطا در ثبت‌نام"));
+  }
+
+  return response.json();
 }
 
 export async function fetchCurrentUser() {

@@ -42,3 +42,14 @@ class TokenOut(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: TokenUser
+
+
+class LoginOtpStartOut(BaseModel):
+    challenge_id: int
+    expires_in_seconds: int
+    debug_otp: str | None = None
+
+
+class LoginOtpVerifyIn(BaseModel):
+    challenge_id: int
+    otp_code: str = Field(min_length=4, max_length=12)

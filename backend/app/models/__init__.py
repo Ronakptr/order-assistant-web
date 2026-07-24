@@ -4,6 +4,11 @@ except Exception:
     pass
 
 try:
+    from app.models.otp_challenge import OtpChallenge
+except Exception:
+    pass
+
+try:
     from app.models.product import Product
 except Exception:
     pass
