@@ -98,8 +98,8 @@ export async function loginUser(username, password) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      username,
-      password,
+      username: String(username || "").trim(),
+      password: String(password || ""),
     }),
   });
 
@@ -121,8 +121,8 @@ export async function startLoginOtp(username, password) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      username,
-      password,
+      username: String(username || "").trim(),
+      password: String(password || ""),
     }),
   });
 
